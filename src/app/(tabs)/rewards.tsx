@@ -17,7 +17,7 @@ import { FadeInView } from '@/components/ui/motion';
 import { ScreenContainer } from '@/components/ui/screen-container';
 import { SectionHeader } from '@/components/ui/section-header';
 import { CardSkeleton, HeroCardSkeleton, MembershipSkeleton } from '@/components/ui/skeleton';
-import { StatusBadge, type StatusTone } from '@/components/ui/status-badge';
+import { StatusBadge } from '@/components/ui/status-badge';
 import { Brand, IconSize, Spacing } from '@/constants/theme';
 import { QUEENSTOWN_LOCATIONS } from '@/data/locations';
 import { useHomeScreenData } from '@/hooks/use-home-screen-data';
@@ -26,19 +26,12 @@ import { useRedemptionHistory } from '@/hooks/use-redemption-history';
 import { formatDate } from '@/lib/format';
 import { usePreferredLocation } from '@/lib/preferred-location';
 import { useProfileContext } from '@/lib/profile';
+import { REDEMPTION_STATUS_COPY } from '@/lib/redemption-status-copy';
 import type { RedemptionHistoryItem } from '@/services/redemption';
-import type { RedemptionStatus } from '@/types';
 
 const PARTICIPATING_LOCATION_COUNT = QUEENSTOWN_LOCATIONS.filter(
   (location) => location.currentlyParticipating
 ).length;
-
-const HISTORY_STATUS_COPY: Record<RedemptionStatus, { label: string; tone: StatusTone }> = {
-  confirmed: { label: 'Redeemed', tone: 'success' },
-  pending_staff_confirmation: { label: 'Awaiting confirmation', tone: 'warning' },
-  cancelled: { label: 'Cancelled', tone: 'neutral' },
-  corrected: { label: 'Corrected', tone: 'neutral' },
-};
 
 export default function RewardsScreen() {
   const {
@@ -216,7 +209,7 @@ export default function RewardsScreen() {
 }
 
 function HistoryRow({ item, isLast }: { item: RedemptionHistoryItem; isLast: boolean }) {
-  const copy = HISTORY_STATUS_COPY[item.status];
+  const copy = REDEMPTION_STATUS_COPY[item.status];
   return (
     <View
       style={[styles.historyRow, !isLast && styles.historyRowBorder]}

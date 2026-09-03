@@ -10,9 +10,11 @@ export type StatusBadgeProps = {
   label: string;
   tone: StatusTone;
   icon?: keyof typeof Ionicons.glyphMap;
+  /** Solid dark pill with white text/icon, instead of the default tone-tinted pill. */
+  solid?: boolean;
 };
 
-const TONE_COLOR: Record<StatusTone, string> = {
+export const TONE_COLOR: Record<StatusTone, string> = {
   success: Brand.success,
   primary: Brand.primary,
   warning: Brand.warning,
@@ -33,16 +35,22 @@ const TONE_ICON: Record<StatusTone, keyof typeof Ionicons.glyphMap> = {
  * pairs with a distinct icon and label so status reads correctly even
  * without color perception.
  */
-export function StatusBadge({ label, tone, icon }: StatusBadgeProps) {
+export function StatusBadge({ label, tone, icon, solid = false }: StatusBadgeProps) {
   const color = TONE_COLOR[tone];
+  const contentColor = solid ? Brand.onPrimary : color;
 
   return (
     <View
-      style={[styles.badge, { backgroundColor: `${color}1F`, borderColor: `${color}55` }]}
+      style={[
+        styles.badge,
+        solid
+          ? { backgroundColor: Brand.charcoal, borderColor: Brand.charcoal }
+          : { backgroundColor: `${color}1F`, borderColor: `${color}55` },
+      ]}
       accessibilityLabel={label}
     >
-      <Ionicons name={icon ?? TONE_ICON[tone]} size={13} color={color} />
-      <ThemedText type="smallBold" style={{ color }}>
+      <Ionicons name={icon ?? TONE_ICON[tone]} size={13} color={contentColor} />
+      <ThemedText type="smallBold" style={{ color: contentColor }}>
         {label}
       </ThemedText>
     </View>

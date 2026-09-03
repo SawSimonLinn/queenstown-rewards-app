@@ -3,7 +3,7 @@ import Constants from 'expo-constants';
 import * as Notifications from 'expo-notifications';
 import { useRouter } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, StyleSheet, Switch, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, Switch, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { AppHeader } from '@/components/ui/app-header';
@@ -171,61 +171,35 @@ export default function ProfileScreen() {
               label="Account settings"
               onPress={() => router.push('/account-settings')}
             />
-            <SettingsRowDivider />
-            <SettingsRow
-              icon="time-outline"
-              label="Redemption history"
-              onPress={() => router.push('/(tabs)/rewards')}
-            />
+            {(!profile || profile.role === 'customer') && (
+              <>
+                <SettingsRowDivider />
+                <SettingsRow
+                  icon="time-outline"
+                  label="Redemption history"
+                  onPress={() => router.push('/(tabs)/rewards')}
+                />
+              </>
+            )}
             <SettingsRowDivider />
             <SettingsRow
               icon="help-circle-outline"
               label="Help & FAQ"
-              onPress={() =>
-                Alert.alert(
-                  'Help & FAQ',
-                  'Support content is coming soon. Contact your local Queenstown location for now.'
-                )
-              }
+              onPress={() => router.push('/help')}
             />
             <SettingsRowDivider />
             <SettingsRow
               icon="shield-checkmark-outline"
               label="Privacy policy"
-              onPress={() =>
-                Alert.alert('Privacy policy', 'The full privacy policy will be published here.')
-              }
+              onPress={() => router.push('/privacy-policy')}
             />
             <SettingsRowDivider />
             <SettingsRow
               icon="document-text-outline"
               label="Terms and conditions"
-              onPress={() =>
-                Alert.alert('Terms and conditions', 'The full terms will be published here.')
-              }
+              onPress={() => router.push('/terms-and-conditions')}
             />
           </Card>
-
-          {profile && profile.role !== 'customer' && (
-            <Card noPadding accessibilityLabel="Staff tools" style={styles.group}>
-              <View style={styles.staffBlock}>
-                <View style={styles.staffHeader}>
-                  <Ionicons name="qr-code-outline" size={IconSize.medium} color={Brand.primary} />
-                  <View style={styles.staffText}>
-                    <ThemedText type="smallBold">Staff tools</ThemedText>
-                    <ThemedText type="small" themeColor="textSecondary">
-                      Confirm customer redemptions at your location.
-                    </ThemedText>
-                  </View>
-                </View>
-                <Button
-                  label="Pending redemptions"
-                  variant="outline"
-                  onPress={() => router.push('/staff/pending-redemptions')}
-                />
-              </View>
-            </Card>
-          )}
 
           <Card noPadding accessibilityLabel="Notification preferences" style={styles.group}>
             <View style={styles.switchRow}>
@@ -320,19 +294,6 @@ const styles = StyleSheet.create({
   group: {
     borderRadius: Radius.medium,
     overflow: 'hidden',
-  },
-  staffBlock: {
-    padding: Spacing.three,
-    gap: Spacing.three,
-  },
-  staffHeader: {
-    flexDirection: 'row',
-    gap: Spacing.two,
-    alignItems: 'flex-start',
-  },
-  staffText: {
-    flex: 1,
-    gap: 2,
   },
   switchRow: {
     flexDirection: 'row',

@@ -3,7 +3,22 @@ import { mapProfileRow, type ProfileRow } from '@/lib/supabase/mappers';
 import type { Profile } from '@/types';
 
 export async function getMyProfile(): Promise<Profile | null> {
-  const { data, error } = await supabase.from('profiles').select('*').maybeSingle();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return null;
+
+  // Explicit filter, not just RLS: "Users can view their own profile" alone
+  // would have scoped an unfiltered select to exactly one row, but staff/admin
+  // accounts also match "Staff and admins can view all profiles" — RLS
+  // policies are OR'd, so an unfiltered select for a staff/admin account
+  // returns every profile row and breaks maybeSingle(). Same reasoning as
+  // the .eq in updateMyProfile below.
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', user.id)
+    .maybeSingle();
   if (error) throw error;
   if (data) return mapProfileRow(data as ProfileRow);
 

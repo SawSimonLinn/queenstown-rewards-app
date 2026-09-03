@@ -158,8 +158,12 @@ function RootLayoutNav() {
             options={{ headerShown: true, headerTitle: 'Review redemption' }}
           />
           <Stack.Screen
-            name="staff/pending-redemptions"
-            options={{ headerShown: true, headerTitle: 'Pending redemptions' }}
+            name="staff/special-form"
+            options={{ headerShown: true, headerTitle: 'Special' }}
+          />
+          <Stack.Screen
+            name="staff/campaign-form"
+            options={{ headerShown: true, headerTitle: 'Campaign' }}
           />
           <Stack.Screen
             name="specials/index"
@@ -196,6 +200,15 @@ function RootLayoutNav() {
           <Stack.Screen
             name="burger-club/terms"
             options={{ headerShown: true, headerTitle: 'Club Terms' }}
+          />
+          <Stack.Screen name="help" options={{ headerShown: true, headerTitle: 'Help & FAQ' }} />
+          <Stack.Screen
+            name="privacy-policy"
+            options={{ headerShown: true, headerTitle: 'Privacy Policy' }}
+          />
+          <Stack.Screen
+            name="terms-and-conditions"
+            options={{ headerShown: true, headerTitle: 'Terms & Conditions' }}
           />
         </Stack.Protected>
 

@@ -3,8 +3,8 @@ import { StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { Card } from '@/components/ui/card';
-import { StatusBadge, type StatusTone } from '@/components/ui/status-badge';
-import { Brand, IconSize, Spacing } from '@/constants/theme';
+import { StatusBadge, TONE_COLOR, type StatusTone } from '@/components/ui/status-badge';
+import { IconSize, Spacing } from '@/constants/theme';
 import { formatDate } from '@/lib/format';
 import type { MonthlyEntitlement } from '@/types';
 
@@ -14,10 +14,10 @@ export type RedemptionStatusCardProps = {
 
 const STATUS_COPY: Record<
   MonthlyEntitlement['status'],
-  { label: string; tone: StatusTone; icon: keyof typeof Ionicons.glyphMap }
+  { label: string; tone: StatusTone; icon: keyof typeof Ionicons.glyphMap; solid?: boolean }
 > = {
   eligible: { label: 'Available now', tone: 'success', icon: 'checkmark-circle' },
-  redeemed: { label: 'Redeemed this month', tone: 'primary', icon: 'ribbon' },
+  redeemed: { label: 'Redeemed this month', tone: 'neutral', icon: 'ribbon', solid: true },
   expired: { label: 'Redemption unavailable', tone: 'neutral', icon: 'time-outline' },
   ineligible: { label: 'Redemption unavailable', tone: 'neutral', icon: 'time-outline' },
 };
@@ -39,8 +39,8 @@ export function RedemptionStatusCard({ entitlement }: RedemptionStatusCardProps)
   return (
     <Card accessibilityLabel={`Monthly redemption: ${copy.label}`}>
       <View style={styles.row}>
-        <Ionicons name={copy.icon} size={IconSize.medium} color={Brand.primary} />
-        <StatusBadge label={copy.label} tone={copy.tone} />
+        <Ionicons name={copy.icon} size={IconSize.medium} color={TONE_COLOR[copy.tone]} />
+        <StatusBadge label={copy.label} tone={copy.tone} solid={copy.solid} />
       </View>
       <ThemedText type="small" themeColor="textSecondary">
         {entitlement.status === 'redeemed' && entitlement.redeemedAt
