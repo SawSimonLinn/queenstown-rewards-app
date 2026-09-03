@@ -14,8 +14,8 @@ export type AppHeaderProps = {
   rightIcon?: keyof typeof Ionicons.glyphMap;
   onRightPress?: () => void;
   rightAccessibilityLabel?: string;
-  /** Shows a small dot on the right icon, e.g. unread notifications. */
-  rightBadge?: boolean;
+  /** Shows a numeric badge on the right icon, e.g. an unread count. Hidden when 0/undefined; shows "9+" above 9. */
+  rightBadgeCount?: number;
 };
 
 export function AppHeader({
@@ -25,7 +25,7 @@ export function AppHeader({
   rightIcon,
   onRightPress,
   rightAccessibilityLabel,
-  rightBadge,
+  rightBadgeCount,
 }: AppHeaderProps) {
   const theme = useTheme();
 
@@ -66,11 +66,15 @@ export function AppHeader({
             onPress={onRightPress}
             variant="filled"
           />
-          {rightBadge && (
+          {!!rightBadgeCount && rightBadgeCount > 0 && (
             <View
-              style={[styles.badgeDot, { borderColor: theme.background }]}
+              style={[styles.badgeCount, { borderColor: theme.background }]}
               accessibilityElementsHidden
-            />
+            >
+              <ThemedText type="small" style={styles.badgeCountText}>
+                {rightBadgeCount > 9 ? '9+' : rightBadgeCount}
+              </ThemedText>
+            </View>
           )}
         </View>
       )}
@@ -108,14 +112,22 @@ const styles = StyleSheet.create({
     flex: 1,
     gap: 2,
   },
-  badgeDot: {
+  badgeCount: {
     position: 'absolute',
-    top: 8,
-    right: 8,
-    width: 9,
-    height: 9,
-    borderRadius: 5,
+    top: 2,
+    right: 2,
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+    paddingHorizontal: 4,
     backgroundColor: Brand.primary,
     borderWidth: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  badgeCountText: {
+    color: Brand.onPrimary,
+    fontSize: 10,
+    lineHeight: 12,
   },
 });

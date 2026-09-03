@@ -8,6 +8,7 @@ export type RedemptionErrorCode =
   | 'already_redeemed'
   | 'ineligible'
   | 'not_authenticated'
+  | 'not_club_member'
   | 'unknown';
 
 const ERROR_CODE_MAP: Record<string, RedemptionErrorCode> = {
@@ -17,6 +18,10 @@ const ERROR_CODE_MAP: Record<string, RedemptionErrorCode> = {
   ALREADY_REDEEMED: 'already_redeemed',
   INELIGIBLE: 'ineligible',
   NOT_AUTHENTICATED: 'not_authenticated',
+  // Raised by get_or_create_current_entitlement (called internally from
+  // request_redemption) when the scanning customer hasn't joined the
+  // Burger Club — see 20260903092000_require_membership_for_entitlement.sql.
+  NOT_CLUB_MEMBER: 'not_club_member',
 };
 
 export class RedemptionError extends Error {

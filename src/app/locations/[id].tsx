@@ -1,9 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import {
   Alert,
-  Image,
   Linking,
   Modal,
   Pressable,
@@ -15,29 +14,47 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { OpenStatusBadge } from '@/components/locations/open-status-badge';
+import { PreferredLocationStar } from '@/components/locations/preferred-location-star';
+import { WeeklySchedule } from '@/components/locations/weekly-schedule';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Card } from '@/components/ui/card';
-import { FoodImagePlaceholder } from '@/components/ui/food-image-placeholder';
+import { FadingImage } from '@/components/ui/fading-image';
 import { Brand, IconSize, MinTouchTarget, Radius, Shadows, Spacing } from '@/constants/theme';
 import { getRestaurantLocationById } from '@/data/locations';
 import { getLocationImages } from '@/data/location-images';
 import type { RestaurantLocation } from '@/data/types';
+import { useRecentlyViewedLocations } from '@/hooks/use-recently-viewed-locations';
 import { useTabBarBottomPadding } from '@/hooks/use-tab-bar-bottom-padding';
 import { getDirectionsUrl, getFullAddress, getPhoneCallUrl } from '@/lib/maps';
 import {
   getLocationStatus,
   getTodayHoursLabel,
-  getWeeklyScheduleLabels,
   hasBrunchService,
   hasHappyHourService,
 } from '@/lib/schedule';
 
+function useGoBackToLocations() {
+  const router = useRouter();
+  const hasNavigatedRef = useRef(false);
+
+  return () => {
+    if (hasNavigatedRef.current) return;
+    hasNavigatedRef.current = true;
+
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace('/(tabs)/locations');
+    }
+  };
+}
+
 export default function LocationDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const router = useRouter();
   const location = getRestaurantLocationById(id);
   const tabBarBottomPadding = useTabBarBottomPadding();
+  const goBack = useGoBackToLocations();
 
   return (
     <ThemedView style={styles.flex}>
@@ -47,7 +64,7 @@ export default function LocationDetailScreen() {
         <SafeAreaView style={styles.flex}>
           <View style={styles.notFoundBack}>
             <Pressable
-              onPress={() => router.back()}
+              onPress={goBack}
               accessibilityRole="button"
               accessibilityLabel="Go back"
               hitSlop={8}
@@ -76,11 +93,20 @@ function LocationDetail({
   bottomPadding: number;
 }) {
   const router = useRouter();
+  const goBack = useGoBackToLocations();
   const status = getLocationStatus(location);
-  const weeklySchedule = getWeeklyScheduleLabels(location);
   const images = getLocationImages(location.id);
   const [weeklyExpanded, setWeeklyExpanded] = useState(false);
   const [viewerIndex, setViewerIndex] = useState<number | null>(null);
+  const { recordView } = useRecentlyViewedLocations();
+
+  useEffect(() => {
+    recordView(location.id);
+    // Only re-fires when the viewed location itself changes, not on every
+    // recordView identity change (it depends on session, which shouldn't
+    // re-record the same view).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.id]);
 
   const brunch = hasBrunchService(location);
   const happyHour = hasHappyHourService(location);
@@ -124,26 +150,37 @@ function LocationDetail({
       >
         {/* Hero */}
         <View style={styles.hero}>
-          {images.hero ? (
-            <Image source={images.hero} style={StyleSheet.absoluteFill} resizeMode="cover" />
-          ) : (
-            <FoodImagePlaceholder height={260} radius={0} icon="storefront" label={location.name} />
-          )}
+          <FadingImage
+            source={images.hero}
+            height="100%"
+            radius={0}
+            style={StyleSheet.absoluteFill}
+            fallbackIcon="storefront"
+            fallbackLabel={location.name}
+          />
 
           <SafeAreaView edges={['top']} style={styles.heroTopBar}>
-            <HeroIconButton
-              icon="chevron-back"
-              accessibilityLabel="Go back"
-              onPress={() => router.back()}
-            />
+            <HeroIconButton icon="chevron-back" accessibilityLabel="Go back" onPress={goBack} />
             <View style={styles.heroTopRight}>
-              <HeroIconButton icon="share-outline" accessibilityLabel="Share this location" onPress={shareLocation} />
+              <HeroIconButton
+                icon="share-outline"
+                accessibilityLabel="Share this location"
+                onPress={shareLocation}
+              />
             </View>
           </SafeAreaView>
 
           {images.logo && (
             <View style={styles.heroLogoWrap}>
-              <Image source={images.logo} style={styles.heroLogo} resizeMode="contain" />
+              <FadingImage
+                source={images.logo}
+                width={56}
+                height={56}
+                radius={28}
+                contentFit="contain"
+                fallbackIcon="storefront"
+                fallbackSize="small"
+              />
             </View>
           )}
         </View>
@@ -151,9 +188,12 @@ function LocationDetail({
         <View style={styles.content}>
           {/* Summary */}
           <View style={styles.summaryGroup}>
-            <ThemedText type="display" style={styles.name}>
-              {location.name}
-            </ThemedText>
+            <View style={styles.nameRow}>
+              <ThemedText type="display" style={styles.name}>
+                {location.name}
+              </ThemedText>
+              <PreferredLocationStar location={location} size={26} showLabel />
+            </View>
             <ThemedText type="smallBold" themeColor="textSecondary">
               {location.neighbourhood}
             </ThemedText>
@@ -168,7 +208,9 @@ function LocationDetail({
             <ThemedText type="small" themeColor="textSecondary">
               {getFullAddress(location)}
             </ThemedText>
-            {location.description && <ThemedText style={styles.description}>{location.description}</ThemedText>}
+            {location.description && (
+              <ThemedText style={styles.description}>{location.description}</ThemedText>
+            )}
           </View>
 
           {/* Primary actions */}
@@ -180,11 +222,6 @@ function LocationDetail({
             {location.website && (
               <ActionButton icon="globe-outline" label="Website" onPress={openWebsite} />
             )}
-            <ActionButton
-              icon="time-outline"
-              label="Hours"
-              onPress={() => setWeeklyExpanded(true)}
-            />
           </View>
 
           {/* Burger Club */}
@@ -235,53 +272,23 @@ function LocationDetail({
                 Contact the restaurant to confirm today&apos;s hours.
               </ThemedText>
             ) : (
-              <>
-                <ThemedText type="smallBold" style={styles.todayHours}>
-                  Today: {getTodayHoursLabel(location)}
-                </ThemedText>
-                <Pressable
-                  onPress={() => setWeeklyExpanded((value) => !value)}
-                  accessibilityRole="button"
-                  accessibilityLabel={weeklyExpanded ? 'Hide weekly schedule' : 'Show weekly schedule'}
-                  style={styles.expandRow}
-                >
-                  <ThemedText type="small" style={styles.expandLabel}>
-                    {weeklyExpanded ? 'Hide weekly schedule' : 'Show weekly schedule'}
-                  </ThemedText>
-                  <Ionicons
-                    name={weeklyExpanded ? 'chevron-up' : 'chevron-down'}
-                    size={16}
-                    color={Brand.primary}
-                  />
-                </Pressable>
-                {weeklyExpanded && (
-                  <View style={styles.hoursList}>
-                    {weeklySchedule.map(({ day, label, hours }, index) => (
-                      <View
-                        key={day}
-                        style={[
-                          styles.hoursRow,
-                          index < weeklySchedule.length - 1 && styles.rowBorder,
-                        ]}
-                      >
-                        <ThemedText type="small" themeColor="textSecondary">
-                          {label}
-                        </ThemedText>
-                        <ThemedText type="small" themeColor="textSecondary" style={styles.hoursValue}>
-                          {hours}
-                        </ThemedText>
-                      </View>
-                    ))}
-                  </View>
-                )}
-              </>
+              <WeeklySchedule
+                location={location}
+                expanded={weeklyExpanded}
+                onToggleExpanded={() => setWeeklyExpanded((value) => !value)}
+              />
             )}
           </Section>
 
           {/* Additional information */}
           {(brunch || happyHour || location.specialServiceHours?.length) && (
             <Section title="Additional information" icon="sparkles-outline">
-              {brunch && <InfoRow label="Brunch" value="Verified weekend brunch service — see hours above." />}
+              {brunch && (
+                <InfoRow
+                  label="Brunch"
+                  value="Verified weekend brunch service — see hours above."
+                />
+              )}
               {location.specialServiceHours?.map((service) => (
                 <InfoRow
                   key={service.id}
@@ -304,10 +311,22 @@ function LocationDetail({
               <ThemedText type="smallBold" style={styles.galleryTitle}>
                 Photos
               </ThemedText>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.galleryScroll}>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={styles.galleryScroll}
+              >
                 {images.gallery.map((source, index) => (
                   <Pressable key={index} onPress={() => setViewerIndex(index)}>
-                    <Image source={source} style={styles.galleryImage} resizeMode="cover" />
+                    <FadingImage
+                      source={source}
+                      width={160}
+                      height={120}
+                      radius={Radius.medium}
+                      style={styles.galleryImage}
+                      fallbackIcon="image-outline"
+                      fallbackSize="small"
+                    />
                   </Pressable>
                 ))}
               </ScrollView>
@@ -327,10 +346,14 @@ function LocationDetail({
             <Ionicons name="close" size={28} color={Brand.onPrimary} />
           </Pressable>
           {viewerIndex !== null && images.gallery[viewerIndex] && (
-            <Image
+            <FadingImage
               source={images.gallery[viewerIndex]}
+              width="100%"
+              height="80%"
+              radius={0}
               style={styles.viewerImage}
-              resizeMode="contain"
+              contentFit="contain"
+              fallbackIcon="image-outline"
             />
           )}
         </View>
@@ -353,6 +376,7 @@ function HeroIconButton({
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
       onPress={onPress}
+      hitSlop={2}
       style={({ pressed }) => [styles.heroButton, pressed && styles.heroButtonPressed]}
     >
       <Ionicons name={icon} size={20} color={Brand.charcoal} />
@@ -483,8 +507,15 @@ const styles = StyleSheet.create({
   summaryGroup: {
     gap: Spacing.one,
   },
+  nameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: Spacing.two,
+  },
   name: {
     color: Brand.charcoal,
+    flexShrink: 1,
   },
   badgeRow: {
     flexDirection: 'row',
@@ -582,37 +613,6 @@ const styles = StyleSheet.create({
   },
   sectionBody: {
     gap: Spacing.two,
-  },
-  todayHours: {
-    color: Brand.primaryDark,
-  },
-  expandRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.one,
-  },
-  expandLabel: {
-    color: Brand.primary,
-    fontWeight: '700',
-  },
-  hoursList: {
-    borderTopWidth: 1,
-    borderTopColor: `${Brand.charcoal}14`,
-    marginTop: Spacing.one,
-  },
-  hoursRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: Spacing.three,
-    paddingVertical: Spacing.two,
-  },
-  hoursValue: {
-    flex: 1,
-    textAlign: 'right',
-  },
-  rowBorder: {
-    borderBottomWidth: 1,
-    borderBottomColor: `${Brand.charcoal}14`,
   },
   infoRow: {
     gap: 2,

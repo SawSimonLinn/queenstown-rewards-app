@@ -5,7 +5,7 @@ import { RewardStateBadge } from '@/components/rewards/reward-state-badge';
 import { ThemedText } from '@/components/themed-text';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { FoodImagePlaceholder } from '@/components/ui/food-image-placeholder';
+import { FadingImage } from '@/components/ui/fading-image';
 import { OrganicEdge } from '@/components/ui/organic-edge';
 import { Brand, IconSize, Radius, Spacing } from '@/constants/theme';
 import { isRedeemable } from '@/lib/eligibility';
@@ -34,6 +34,12 @@ export function ClubRewardCard({
   onViewTermsPress,
 }: ClubRewardCardProps) {
   const canRedeem = isRedeemable(status);
+  const isRedeemed = status === 'redeemed';
+  const actionLabel = canRedeem
+    ? 'Scan to Redeem'
+    : isRedeemed
+      ? 'Redeemed this month'
+      : 'Not available';
 
   return (
     <Card
@@ -64,12 +70,13 @@ export function ClubRewardCard({
       <OrganicEdge color={Brand.onPrimary} height={16} />
 
       <View style={styles.ticketBody}>
-        <FoodImagePlaceholder
+        <FadingImage
+          source={campaign.imageUrl}
           height={156}
           radius={Radius.medium}
-          icon={canRedeem ? 'fast-food' : 'fast-food-outline'}
-          label="Monthly burger crop"
-          tone="golden"
+          fallbackIcon={canRedeem ? 'fast-food' : 'fast-food-outline'}
+          fallbackLabel="Monthly burger crop"
+          fallbackTone="golden"
         />
 
         <View style={styles.body}>
@@ -105,12 +112,7 @@ export function ClubRewardCard({
       </View>
 
       <View style={styles.actions}>
-        <Button
-          label={canRedeem ? 'Redeem at Restaurant' : 'Not available'}
-          onPress={onRedeemPress}
-          disabled={!canRedeem}
-          size="large"
-        />
+        <Button label={actionLabel} onPress={onRedeemPress} disabled={!canRedeem} size="large" />
         <ThemedText type="linkPrimary" onPress={onViewTermsPress} style={styles.termsLink}>
           View Burger Club terms
         </ThemedText>

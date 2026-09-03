@@ -13,6 +13,7 @@ export type ConfirmationDialogProps = {
   cancelLabel?: string;
   destructive?: boolean;
   loading?: boolean;
+  loadingLabel?: string;
   onConfirm: () => void;
   onDismiss: () => void;
 };
@@ -25,6 +26,7 @@ export function ConfirmationDialog({
   cancelLabel = 'Cancel',
   destructive = false,
   loading = false,
+  loadingLabel,
   onConfirm,
   onDismiss,
 }: ConfirmationDialogProps) {
@@ -58,6 +60,7 @@ export function ConfirmationDialog({
               variant={destructive ? 'primary' : 'secondary'}
               onPress={onConfirm}
               loading={loading}
+              loadingLabel={loadingLabel}
             />
           </View>
         </Pressable>

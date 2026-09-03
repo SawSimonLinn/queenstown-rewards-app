@@ -152,6 +152,7 @@ export default function RegisterScreen() {
           label="Create account"
           onPress={handleSubmit(onSubmit)}
           loading={isSubmitting}
+          loadingLabel="Creating account"
           size="large"
         />
       </View>

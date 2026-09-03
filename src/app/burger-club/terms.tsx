@@ -7,7 +7,7 @@ import { ScreenContainer } from '@/components/ui/screen-container';
 import { Brand, Spacing } from '@/constants/theme';
 
 const TERMS: string[] = [
-  'Membership enrolment is required to participate in the Burger of the Month Club.',
+  'Club membership is required to participate in the Burger of the Month Club.',
   'Members agree to receive Burger Club and promotional email updates.',
   'The complimentary offer applies to the designated Burger of the Month only.',
   'Purchase of another qualifying entrée is required to redeem the complimentary burger.',

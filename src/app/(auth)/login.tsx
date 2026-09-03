@@ -103,6 +103,7 @@ export default function LoginScreen() {
           label="Sign in"
           onPress={handleSubmit(onSubmit)}
           loading={isSubmitting}
+          loadingLabel="Signing in"
           size="large"
         />
       </View>

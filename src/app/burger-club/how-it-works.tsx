@@ -9,7 +9,7 @@ import { ScreenContainer } from '@/components/ui/screen-container';
 import { Brand, Spacing } from '@/constants/theme';
 
 const STEPS: { title: string; detail: string }[] = [
-  { title: 'Join the Burger of the Month Club', detail: 'Enrol once — it takes a minute.' },
+  { title: 'Join the Club', detail: 'Join once — it takes a minute.' },
   {
     title: 'Receive access to the featured monthly burger',
     detail: 'A new complimentary burger unlocks in the app every month.',

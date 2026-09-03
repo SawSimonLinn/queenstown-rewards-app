@@ -6,8 +6,8 @@ export type RewardStateBadgeProps = {
 };
 
 const BADGE_COPY: Record<EntitlementStatus, { label: string; tone: StatusTone }> = {
-  eligible: { label: 'Available', tone: 'success' },
-  redeemed: { label: 'Used', tone: 'primary' },
+  eligible: { label: 'Your burger is ready', tone: 'success' },
+  redeemed: { label: 'Redeemed this month', tone: 'primary' },
   expired: { label: 'Expired', tone: 'danger' },
   ineligible: { label: 'Ineligible', tone: 'warning' },
 };

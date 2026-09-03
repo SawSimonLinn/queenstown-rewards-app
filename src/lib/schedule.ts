@@ -77,37 +77,75 @@ export function getTodayHoursLabel(location: RestaurantLocation, at: Date = new 
   return schedule.periods.map((period) => formatPeriod(period)).join(', ');
 }
 
-export function getWeeklyScheduleLabels(
-  location: RestaurantLocation
-): { day: DayOfWeek; label: string; hours: string }[] {
-  const DAY_LABEL: Record<DayOfWeek, string> = {
-    monday: 'Monday',
-    tuesday: 'Tuesday',
-    wednesday: 'Wednesday',
-    thursday: 'Thursday',
-    friday: 'Friday',
-    saturday: 'Saturday',
-    sunday: 'Sunday',
-  };
-  const orderedDays: DayOfWeek[] = [
-    'monday',
-    'tuesday',
-    'wednesday',
-    'thursday',
-    'friday',
-    'saturday',
-    'sunday',
-  ];
+const WEEKDAY_ORDER: DayOfWeek[] = [
+  'monday',
+  'tuesday',
+  'wednesday',
+  'thursday',
+  'friday',
+  'saturday',
+  'sunday',
+];
 
-  return orderedDays.map((day) => {
+const DAY_LABEL: Record<DayOfWeek, string> = {
+  monday: 'Monday',
+  tuesday: 'Tuesday',
+  wednesday: 'Wednesday',
+  thursday: 'Thursday',
+  friday: 'Friday',
+  saturday: 'Saturday',
+  sunday: 'Sunday',
+};
+
+/** A single service window formatted for display, e.g. { label: 'Dinner', hours: '4:00 PM–close' }. */
+export type ScheduleRowPeriod = { label: string; hours: string };
+
+export type ScheduleRow = {
+  day: DayOfWeek;
+  dayLabel: string;
+  isToday: boolean;
+} & (
+  | { status: 'periods'; periods: ScheduleRowPeriod[] }
+  | { status: 'closed' }
+  | { status: 'unavailable' }
+);
+
+/** `open–close` with no label baked in and no space around the dash, for the two-column schedule row. */
+function formatTimeRange(period: ServicePeriod): string {
+  const open = formatTime(period.open);
+  const close = period.close ? formatTime(period.close) : 'close';
+  return `${open}–${close}`;
+}
+
+/** Structured, per-day schedule rows (Monday–Sunday) for the Location Details schedule UI. */
+export function getWeeklyScheduleRows(
+  location: RestaurantLocation,
+  at: Date = new Date()
+): ScheduleRow[] {
+  const today = getZonedParts(location.timezone, at).weekday;
+
+  return WEEKDAY_ORDER.map((day) => {
+    const dayLabel = DAY_LABEL[day];
+    const isToday = day === today;
     const schedule = location.weeklyHours[day];
-    const hours =
-      location.hoursUnconfirmed || !schedule || schedule.periods.length === 0
-        ? location.hoursUnconfirmed
-          ? 'Awaiting confirmation'
-          : 'Closed'
-        : schedule.periods.map((period) => formatPeriod(period)).join(', ');
-    return { day, label: DAY_LABEL[day], hours };
+
+    if (location.hoursUnconfirmed || schedule === undefined) {
+      return { day, dayLabel, isToday, status: 'unavailable' as const };
+    }
+    if (schedule === null || schedule.periods.length === 0) {
+      return { day, dayLabel, isToday, status: 'closed' as const };
+    }
+
+    return {
+      day,
+      dayLabel,
+      isToday,
+      status: 'periods' as const,
+      periods: schedule.periods.map((period) => ({
+        label: period.label ?? 'Open',
+        hours: formatTimeRange(period),
+      })),
+    };
   });
 }
 

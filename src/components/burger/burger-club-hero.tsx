@@ -6,7 +6,7 @@ import { RewardStateBadge } from '@/components/rewards/reward-state-badge';
 import { ThemedText } from '@/components/themed-text';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { FoodImagePlaceholder } from '@/components/ui/food-image-placeholder';
+import { FadingImage } from '@/components/ui/fading-image';
 import { IS_SAMPLE_DATA } from '@/constants/app';
 import { Brand, Radius, Shadows, Spacing } from '@/constants/theme';
 import type { RestaurantLocation } from '@/data/types';
@@ -14,22 +14,33 @@ import { isRedeemable } from '@/lib/eligibility';
 import { formatDate } from '@/lib/format';
 import type { BurgerCampaign, MonthlyEntitlement } from '@/types';
 
+export type HeroCtaState = 'guest' | 'join' | 'eligible' | 'redeemed' | 'no-campaign';
+
+const CTA_COPY: Record<HeroCtaState, string> = {
+  guest: 'Sign in to join',
+  join: 'Join the Club',
+  eligible: 'Scan to Redeem',
+  redeemed: 'Redeemed this month',
+  'no-campaign': 'Check back soon',
+};
+
 export type BurgerClubHeroProps = {
   campaign: BurgerCampaign | null;
   entitlement: MonthlyEntitlement | null;
   preferredLocation: RestaurantLocation | null;
-  onViewBurger: () => void;
-  onHowItWorks: () => void;
+  ctaState: HeroCtaState;
+  onCtaPress: () => void;
 };
 
 export function BurgerClubHero({
   campaign,
   entitlement,
   preferredLocation,
-  onViewBurger,
-  onHowItWorks,
+  ctaState,
+  onCtaPress,
 }: BurgerClubHeroProps) {
   const canRedeem = entitlement ? isRedeemable(entitlement.status) : false;
+  const ctaDisabled = ctaState === 'redeemed' || ctaState === 'no-campaign';
 
   return (
     <Card noPadding elevated style={styles.card} accessibilityLabel="Burger of the Month Club">
@@ -54,11 +65,12 @@ export function BurgerClubHero({
         </ThemedText>
 
         {campaign && (
-          <FoodImagePlaceholder
+          <FadingImage
+            source={campaign.imageUrl}
             height={174}
             radius={Radius.medium}
-            icon="fast-food"
-            label="Burger campaign crop"
+            fallbackIcon="fast-food"
+            fallbackLabel="Burger campaign crop"
           />
         )}
       </LinearGradient>
@@ -101,22 +113,18 @@ export function BurgerClubHero({
             </View>
 
             <View style={styles.actions}>
-              <Button label="View Reward" onPress={onViewBurger} size="large" />
-              <Button label="How It Works" variant="outline" onPress={onHowItWorks} />
+              <Button
+                label={CTA_COPY[ctaState]}
+                onPress={onCtaPress}
+                disabled={ctaDisabled}
+                size="large"
+              />
             </View>
           </>
         ) : (
-          <>
-            <ThemedText themeColor="textSecondary">
-              We&apos;re between monthly burgers right now — check back soon.
-            </ThemedText>
-            <Button
-              label="How It Works"
-              variant="outline"
-              onPress={onHowItWorks}
-              fullWidth={false}
-            />
-          </>
+          <ThemedText themeColor="textSecondary">
+            We&apos;re between monthly burgers right now — check back soon.
+          </ThemedText>
         )}
       </View>
     </Card>

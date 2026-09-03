@@ -1,4 +1,9 @@
-import { getLocationStatus, getTodayHoursLabel, getNextOpeningLabel } from '@/lib/schedule';
+import {
+  getLocationStatus,
+  getTodayHoursLabel,
+  getNextOpeningLabel,
+  getWeeklyScheduleRows,
+} from '@/lib/schedule';
 import type { RestaurantLocation } from '@/data/types';
 
 // A fixed instant, expressed as a UTC ISO string, is used throughout so
@@ -99,5 +104,74 @@ describe('getNextOpeningLabel', () => {
   it('finds the next opening after closing time today', () => {
     const label = getNextOpeningLabel(makeLocation(), TUESDAY_10PM_PACIFIC);
     expect(label).toMatch(/^Opens (tomorrow|Wednesday) at/);
+  });
+});
+
+describe('getWeeklyScheduleRows', () => {
+  it('orders days Monday through Sunday and marks today', () => {
+    const rows = getWeeklyScheduleRows(makeLocation(), TUESDAY_1PM_PACIFIC);
+    expect(rows.map((row) => row.day)).toEqual([
+      'monday',
+      'tuesday',
+      'wednesday',
+      'thursday',
+      'friday',
+      'saturday',
+      'sunday',
+    ]);
+    expect(rows.map((row) => row.dayLabel)).toContain('Wednesday');
+    expect(rows.find((row) => row.day === 'tuesday')?.isToday).toBe(true);
+    expect(rows.find((row) => row.day === 'wednesday')?.isToday).toBe(false);
+  });
+
+  it('labels an unlabeled all-day period "Open"', () => {
+    const rows = getWeeklyScheduleRows(makeLocation(), TUESDAY_1PM_PACIFIC);
+    const tuesday = rows.find((row) => row.day === 'tuesday');
+    expect(tuesday?.status).toBe('periods');
+    if (tuesday?.status === 'periods') {
+      expect(tuesday.periods).toEqual([{ label: 'Open', hours: '11:00 AM–8:00 PM' }]);
+    }
+  });
+
+  it('stacks Lunch and Dinner as separate periods', () => {
+    const location = makeLocation({
+      weeklyHours: {
+        ...makeLocation().weeklyHours,
+        tuesday: {
+          periods: [
+            { label: 'Lunch', open: '11:00', close: '15:00' },
+            { label: 'Dinner', open: '16:00', close: '22:00' },
+          ],
+        },
+      },
+    });
+    const tuesday = getWeeklyScheduleRows(location, TUESDAY_1PM_PACIFIC).find(
+      (row) => row.day === 'tuesday'
+    );
+    expect(tuesday?.status).toBe('periods');
+    if (tuesday?.status === 'periods') {
+      expect(tuesday.periods).toEqual([
+        { label: 'Lunch', hours: '11:00 AM–3:00 PM' },
+        { label: 'Dinner', hours: '4:00 PM–10:00 PM' },
+      ]);
+    }
+  });
+
+  it('marks a day with no schedule as closed', () => {
+    const location = makeLocation({
+      weeklyHours: { ...makeLocation().weeklyHours, tuesday: null },
+    });
+    const tuesday = getWeeklyScheduleRows(location, TUESDAY_1PM_PACIFIC).find(
+      (row) => row.day === 'tuesday'
+    );
+    expect(tuesday?.status).toBe('closed');
+  });
+
+  it('marks every day unavailable when hours are unconfirmed', () => {
+    const rows = getWeeklyScheduleRows(
+      makeLocation({ hoursUnconfirmed: true }),
+      TUESDAY_1PM_PACIFIC
+    );
+    expect(rows.every((row) => row.status === 'unavailable')).toBe(true);
   });
 });

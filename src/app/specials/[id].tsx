@@ -5,7 +5,8 @@ import { StyleSheet, View } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { Card } from '@/components/ui/card';
 import { ErrorState } from '@/components/ui/error-state';
-import { FoodImagePlaceholder } from '@/components/ui/food-image-placeholder';
+import { FadingImage } from '@/components/ui/fading-image';
+import { FadeInView } from '@/components/ui/motion';
 import { ScreenContainer } from '@/components/ui/screen-container';
 import { HeroCardSkeleton } from '@/components/ui/skeleton';
 import { StatusBadge } from '@/components/ui/status-badge';
@@ -20,24 +21,39 @@ export default function SpecialDetailScreen() {
 
   return (
     <ScreenContainer scroll>
-      {state.status === 'loading' && <HeroCardSkeleton />}
+      {state.status === 'loading' && (
+        <FadeInView>
+          <HeroCardSkeleton />
+        </FadeInView>
+      )}
 
-      {state.status === 'error' && <ErrorState message={state.message} onRetry={retry} />}
+      {state.status === 'error' && (
+        <FadeInView>
+          <ErrorState message={state.message} onRetry={retry} />
+        </FadeInView>
+      )}
 
       {state.status === 'not-found' && (
-        <Card accessibilityLabel="Special not found">
-          <ThemedText themeColor="textSecondary">
-            This special couldn&apos;t be found. It may have ended.
-          </ThemedText>
-        </Card>
+        <FadeInView>
+          <Card accessibilityLabel="Special not found">
+            <ThemedText themeColor="textSecondary">
+              This special couldn&apos;t be found. It may have ended.
+            </ThemedText>
+          </Card>
+        </FadeInView>
       )}
 
       {state.status === 'success' &&
         (() => {
           const timing = getSpecialTiming(state.data.special);
           return (
-            <>
-              <FoodImagePlaceholder height={190} icon="pricetag" label="Sample special photo" />
+            <FadeInView slide layout style={styles.contentGroup}>
+              <FadingImage
+                source={state.data.special.imageUrl}
+                height={190}
+                fallbackIcon="pricetag"
+                fallbackLabel="Sample special photo"
+              />
 
               <View style={styles.headerRow}>
                 <ThemedText type="title" style={styles.title}>
@@ -87,7 +103,7 @@ export default function SpecialDetailScreen() {
                   locations. Sample terms — not official Queenstown pricing.
                 </ThemedText>
               </Card>
-            </>
+            </FadeInView>
           );
         })()}
     </ScreenContainer>
@@ -95,6 +111,9 @@ export default function SpecialDetailScreen() {
 }
 
 const styles = StyleSheet.create({
+  contentGroup: {
+    gap: Spacing.four,
+  },
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',

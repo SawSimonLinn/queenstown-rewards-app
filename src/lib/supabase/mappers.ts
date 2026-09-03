@@ -3,11 +3,15 @@
 // app never has to think about the database's column naming.
 
 import type {
+  AppNotification,
   BurgerCampaign,
   CampaignStatus,
+  ClubMembership,
+  ClubMembershipStatus,
   EntitlementStatus,
   Location,
   MonthlyEntitlement,
+  NotificationType,
   OpeningHours,
   Profile,
   Special,
@@ -129,6 +133,7 @@ export type ProfileRow = {
   email: string;
   role: UserRole;
   preferred_location_id: string | null;
+  onboarding_completed_at: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -140,6 +145,55 @@ export function mapProfileRow(row: ProfileRow): Profile {
     email: row.email,
     role: row.role,
     preferredLocationId: row.preferred_location_id,
+    onboardingCompletedAt: row.onboarding_completed_at,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
+
+export type NotificationRow = {
+  id: string;
+  profile_id: string;
+  type: NotificationType;
+  title: string;
+  message: string;
+  data: Record<string, unknown>;
+  read_at: string | null;
+  created_at: string;
+};
+
+export function mapNotificationRow(row: NotificationRow): AppNotification {
+  return {
+    id: row.id,
+    profileId: row.profile_id,
+    type: row.type,
+    title: row.title,
+    message: row.message,
+    data: row.data,
+    readAt: row.read_at,
+    createdAt: row.created_at,
+  };
+}
+
+export type ClubMembershipRow = {
+  id: string;
+  profile_id: string;
+  status: ClubMembershipStatus;
+  joined_at: string;
+  terms_accepted_at: string;
+  terms_version: string;
+  created_at: string;
+  updated_at: string;
+};
+
+export function mapClubMembershipRow(row: ClubMembershipRow): ClubMembership {
+  return {
+    id: row.id,
+    profileId: row.profile_id,
+    status: row.status,
+    joinedAt: row.joined_at,
+    termsAcceptedAt: row.terms_accepted_at,
+    termsVersion: row.terms_version,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };

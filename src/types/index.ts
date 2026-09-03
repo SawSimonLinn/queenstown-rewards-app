@@ -13,6 +13,7 @@ export interface Profile {
   email: string;
   role: UserRole;
   preferredLocationId: UUID | null;
+  onboardingCompletedAt: ISODateString | null;
   createdAt: ISODateString;
   updatedAt: ISODateString;
 }
@@ -142,6 +143,32 @@ export interface NotificationCampaign {
   status: NotificationCampaignStatus;
   deepLink: string | null;
   createdAt: ISODateString;
+}
+
+export type NotificationType = 'burger_drop' | 'special_offer' | 'account_update' | 'redemption';
+
+export interface AppNotification {
+  id: UUID;
+  profileId: UUID;
+  type: NotificationType;
+  title: string;
+  message: string;
+  data: Record<string, unknown>;
+  readAt: ISODateString | null;
+  createdAt: ISODateString;
+}
+
+export type ClubMembershipStatus = 'active' | 'cancelled';
+
+export interface ClubMembership {
+  id: UUID;
+  profileId: UUID;
+  status: ClubMembershipStatus;
+  joinedAt: ISODateString;
+  termsAcceptedAt: ISODateString;
+  termsVersion: string;
+  createdAt: ISODateString;
+  updatedAt: ISODateString;
 }
 
 export type AuditAction =

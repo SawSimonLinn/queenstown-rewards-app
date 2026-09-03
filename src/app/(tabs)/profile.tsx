@@ -3,19 +3,23 @@ import Constants from 'expo-constants';
 import * as Notifications from 'expo-notifications';
 import { useRouter } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
-import { Alert, Pressable, StyleSheet, Switch, View } from 'react-native';
+import { ActivityIndicator, Alert, StyleSheet, Switch, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { AppHeader } from '@/components/ui/app-header';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
+import { InlineFeedback } from '@/components/ui/inline-feedback';
+import { FadeInView } from '@/components/ui/motion';
 import { ScreenContainer } from '@/components/ui/screen-container';
+import { SettingsRow, SettingsRowDivider } from '@/components/ui/settings-row';
+import { ProfileSkeleton } from '@/components/ui/skeleton';
 import { APP_NAME } from '@/constants/app';
 import { Brand, IconSize, Radius, Spacing } from '@/constants/theme';
+import { useMembership } from '@/hooks/use-membership';
 import { useAuth } from '@/lib/auth';
 import { registerForPushNotificationsAsync } from '@/lib/notifications';
-import { usePreferredLocation } from '@/lib/preferred-location';
 import { useProfileContext } from '@/lib/profile';
 import { signOut } from '@/services/auth';
 import { registerPushToken, unregisterPushToken } from '@/services/push-tokens';
@@ -24,8 +28,18 @@ type PushToggleState = 'checking' | 'enabled' | 'disabled';
 
 export default function ProfileScreen() {
   const { session } = useAuth();
-  const { profile } = useProfileContext();
-  const { preferredLocation } = usePreferredLocation();
+  const {
+    profile,
+    isLoading: isProfileLoading,
+    refresh: refreshProfile,
+    isRefreshing: isProfileRefreshing,
+    refreshError: profileRefreshError,
+  } = useProfileContext();
+  const {
+    refresh: refreshMembership,
+    isRefreshing: isMembershipRefreshing,
+    refreshError: membershipRefreshError,
+  } = useMembership();
   const router = useRouter();
   const [signOutError, setSignOutError] = useState<string | null>(null);
   const [isSigningOut, setIsSigningOut] = useState(false);
@@ -105,188 +119,179 @@ export default function ProfileScreen() {
     .join('')
     .slice(0, 2)
     .toUpperCase();
+  const isRefreshing = isProfileRefreshing || isMembershipRefreshing;
+  const refreshError = profileRefreshError ?? membershipRefreshError;
+
+  const handleRefresh = useCallback(async () => {
+    await Promise.all([refreshProfile(), refreshMembership()]);
+  }, [refreshMembership, refreshProfile]);
 
   return (
-    <ScreenContainer scroll>
+    <ScreenContainer scroll onRefresh={handleRefresh} refreshing={isRefreshing}>
       <AppHeader title="Profile" />
 
-      <Card noPadding accessibilityLabel="Account" style={styles.identityCard}>
-        <View style={styles.identityRow}>
-          <View style={styles.avatar}>
-            <ThemedText type="subtitle" style={styles.avatarText}>
-              {initials}
-            </ThemedText>
-          </View>
-          <View style={styles.identityText}>
-            <ThemedText type="eyebrow" themeColor="textSecondary">
-              Rewards member
-            </ThemedText>
-            <ThemedText type="subtitle" numberOfLines={1}>
-              {profile?.fullName ?? 'Queenstown Rewards member'}
-            </ThemedText>
-            <ThemedText themeColor="textSecondary" numberOfLines={1}>
-              {session?.user.email}
-            </ThemedText>
-          </View>
-        </View>
-      </Card>
+      {refreshError && <InlineFeedback message={refreshError} />}
 
-      <Card noPadding accessibilityLabel="Account settings" style={styles.group}>
-        <ProfileRow
-          icon="location-outline"
-          label="Preferred location"
-          value={preferredLocation?.name ?? 'Choose a restaurant'}
-          onPress={() => router.push('/(tabs)/locations')}
-        />
-        <Divider />
-        <ProfileRow
-          icon="time-outline"
-          label="Redemption history"
-          onPress={() => router.push('/(tabs)/rewards')}
-        />
-        <Divider />
-        <ProfileRow
-          icon="help-circle-outline"
-          label="Help & FAQ"
-          onPress={() =>
-            Alert.alert(
-              'Help & FAQ',
-              'Support content is coming soon. Contact your local Queenstown location for now.'
-            )
-          }
-        />
-        <Divider />
-        <ProfileRow
-          icon="shield-checkmark-outline"
-          label="Privacy policy"
-          onPress={() =>
-            Alert.alert('Privacy policy', 'The full privacy policy will be published here.')
-          }
-        />
-        <Divider />
-        <ProfileRow
-          icon="document-text-outline"
-          label="Terms and conditions"
-          onPress={() =>
-            Alert.alert('Terms and conditions', 'The full terms will be published here.')
-          }
-        />
-      </Card>
-
-      {profile && profile.role !== 'customer' && (
-        <Card noPadding accessibilityLabel="Staff tools" style={styles.group}>
-          <View style={styles.staffBlock}>
-            <View style={styles.staffHeader}>
-              <Ionicons name="qr-code-outline" size={IconSize.medium} color={Brand.primary} />
-              <View style={styles.staffText}>
-                <ThemedText type="smallBold">Staff tools</ThemedText>
-                <ThemedText type="small" themeColor="textSecondary">
-                  Confirm customer redemptions at your location.
+      {isProfileLoading && !profile ? (
+        <FadeInView>
+          <ProfileSkeleton />
+        </FadeInView>
+      ) : (
+        <FadeInView layout style={styles.contentGroup}>
+          <Card
+            noPadding
+            accessibilityLabel="Account, view account settings"
+            style={styles.identityCard}
+            onPress={() => router.push('/account-settings')}
+          >
+            <View style={styles.identityRow}>
+              <View style={styles.avatar}>
+                <ThemedText type="subtitle" style={styles.avatarText}>
+                  {initials}
                 </ThemedText>
               </View>
+              <View style={styles.identityText}>
+                <ThemedText type="eyebrow" themeColor="textSecondary">
+                  Rewards member
+                </ThemedText>
+                <ThemedText type="subtitle" numberOfLines={1}>
+                  {profile?.fullName ?? 'Queenstown Rewards member'}
+                </ThemedText>
+                <ThemedText themeColor="textSecondary" numberOfLines={1}>
+                  {session?.user.email}
+                </ThemedText>
+              </View>
+              <Ionicons name="chevron-forward" size={IconSize.medium} color={Brand.primary} />
             </View>
-            <Button
-              label="Pending redemptions"
-              variant="outline"
-              onPress={() => router.push('/staff/pending-redemptions')}
+          </Card>
+
+          <Card noPadding accessibilityLabel="Account settings" style={styles.group}>
+            <SettingsRow
+              icon="settings-outline"
+              label="Account settings"
+              onPress={() => router.push('/account-settings')}
             />
-          </View>
-        </Card>
-      )}
+            <SettingsRowDivider />
+            <SettingsRow
+              icon="time-outline"
+              label="Redemption history"
+              onPress={() => router.push('/(tabs)/rewards')}
+            />
+            <SettingsRowDivider />
+            <SettingsRow
+              icon="help-circle-outline"
+              label="Help & FAQ"
+              onPress={() =>
+                Alert.alert(
+                  'Help & FAQ',
+                  'Support content is coming soon. Contact your local Queenstown location for now.'
+                )
+              }
+            />
+            <SettingsRowDivider />
+            <SettingsRow
+              icon="shield-checkmark-outline"
+              label="Privacy policy"
+              onPress={() =>
+                Alert.alert('Privacy policy', 'The full privacy policy will be published here.')
+              }
+            />
+            <SettingsRowDivider />
+            <SettingsRow
+              icon="document-text-outline"
+              label="Terms and conditions"
+              onPress={() =>
+                Alert.alert('Terms and conditions', 'The full terms will be published here.')
+              }
+            />
+          </Card>
 
-      <Card noPadding accessibilityLabel="Notification preferences" style={styles.group}>
-        <View style={styles.switchRow}>
-          <View style={styles.switchTextGroup}>
-            <ThemedText type="smallBold">Push notifications</ThemedText>
-            <ThemedText type="small" themeColor="textSecondary">
-              Get notified about Burger of the Month and specials.
-            </ThemedText>
-          </View>
-          <Switch
-            value={pushState === 'enabled'}
-            onValueChange={handleTogglePush}
-            disabled={isTogglingPush || pushState === 'checking'}
-            accessibilityLabel="Push notifications"
-            trackColor={{ true: Brand.primary }}
+          {profile && profile.role !== 'customer' && (
+            <Card noPadding accessibilityLabel="Staff tools" style={styles.group}>
+              <View style={styles.staffBlock}>
+                <View style={styles.staffHeader}>
+                  <Ionicons name="qr-code-outline" size={IconSize.medium} color={Brand.primary} />
+                  <View style={styles.staffText}>
+                    <ThemedText type="smallBold">Staff tools</ThemedText>
+                    <ThemedText type="small" themeColor="textSecondary">
+                      Confirm customer redemptions at your location.
+                    </ThemedText>
+                  </View>
+                </View>
+                <Button
+                  label="Pending redemptions"
+                  variant="outline"
+                  onPress={() => router.push('/staff/pending-redemptions')}
+                />
+              </View>
+            </Card>
+          )}
+
+          <Card noPadding accessibilityLabel="Notification preferences" style={styles.group}>
+            <View style={styles.switchRow}>
+              <View style={styles.switchTextGroup}>
+                <ThemedText type="smallBold">Push notifications</ThemedText>
+                <ThemedText type="small" themeColor="textSecondary">
+                  Get notified about Burger of the Month and specials.
+                </ThemedText>
+              </View>
+              <Switch
+                value={pushState === 'enabled'}
+                onValueChange={handleTogglePush}
+                disabled={isTogglingPush || pushState === 'checking'}
+                accessibilityLabel="Push notifications"
+                trackColor={{ true: Brand.primary }}
+              />
+              {(isTogglingPush || pushState === 'checking') && (
+                <ActivityIndicator size="small" color={Brand.primary} />
+              )}
+            </View>
+            {pushError && (
+              <ThemedText type="small" style={styles.pushError}>
+                {pushError}
+              </ThemedText>
+            )}
+          </Card>
+
+          {signOutError && (
+            <Card accessibilityLabel="Sign out error">
+              <ThemedText style={{ color: Brand.danger }}>{signOutError}</ThemedText>
+            </Card>
+          )}
+
+          <Button
+            label="Sign out"
+            variant="outline"
+            onPress={() => setShowSignOutConfirm(true)}
+            loading={isSigningOut}
+            loadingLabel="Signing out"
           />
-        </View>
-        {pushError && (
-          <ThemedText type="small" style={styles.pushError}>
-            {pushError}
+
+          <ThemedText type="small" themeColor="textSecondary" style={styles.footer}>
+            {APP_NAME} · v{Constants.expoConfig?.version ?? '1.0.0'}
           </ThemedText>
-        )}
-      </Card>
 
-      {signOutError && (
-        <Card accessibilityLabel="Sign out error">
-          <ThemedText style={{ color: Brand.danger }}>{signOutError}</ThemedText>
-        </Card>
+          <ConfirmationDialog
+            visible={showSignOutConfirm}
+            title="Sign out?"
+            message="You'll need to sign back in to view your rewards."
+            confirmLabel="Sign out"
+            destructive
+            loading={isSigningOut}
+            loadingLabel="Signing out"
+            onConfirm={handleSignOut}
+            onDismiss={() => setShowSignOutConfirm(false)}
+          />
+        </FadeInView>
       )}
-
-      <Button
-        label="Sign out"
-        variant="outline"
-        onPress={() => setShowSignOutConfirm(true)}
-        loading={isSigningOut}
-      />
-
-      <ThemedText type="small" themeColor="textSecondary" style={styles.footer}>
-        {APP_NAME} · v{Constants.expoConfig?.version ?? '1.0.0'}
-      </ThemedText>
-
-      <ConfirmationDialog
-        visible={showSignOutConfirm}
-        title="Sign out?"
-        message="You'll need to sign back in to view your rewards."
-        confirmLabel="Sign out"
-        destructive
-        loading={isSigningOut}
-        onConfirm={handleSignOut}
-        onDismiss={() => setShowSignOutConfirm(false)}
-      />
     </ScreenContainer>
   );
 }
 
-function ProfileRow({
-  icon,
-  label,
-  value,
-  onPress,
-}: {
-  icon: keyof typeof Ionicons.glyphMap;
-  label: string;
-  value?: string;
-  onPress: () => void;
-}) {
-  return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={label}
-      onPress={onPress}
-      style={({ pressed }) => [styles.profileRow, pressed && styles.rowPressed]}
-    >
-      <View style={styles.profileIcon}>
-        <Ionicons name={icon} size={IconSize.medium} color={Brand.primary} />
-      </View>
-      <View style={styles.profileRowText}>
-        <ThemedText style={styles.profileRowLabel}>{label}</ThemedText>
-        {value && (
-          <ThemedText type="small" themeColor="textSecondary" numberOfLines={1}>
-            {value}
-          </ThemedText>
-        )}
-      </View>
-      <Ionicons name="chevron-forward" size={18} color={Brand.primary} />
-    </Pressable>
-  );
-}
-
-function Divider() {
-  return <View style={styles.divider} />;
-}
-
 const styles = StyleSheet.create({
+  contentGroup: {
+    gap: Spacing.four,
+  },
   identityCard: {
     overflow: 'hidden',
   },
@@ -315,37 +320,6 @@ const styles = StyleSheet.create({
   group: {
     borderRadius: Radius.medium,
     overflow: 'hidden',
-  },
-  profileRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.three,
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.three,
-    minHeight: 64,
-  },
-  rowPressed: {
-    backgroundColor: Brand.mutedSurface,
-  },
-  profileIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: Radius.small,
-    backgroundColor: `${Brand.primary}14`,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  profileRowText: {
-    flex: 1,
-    gap: 2,
-  },
-  profileRowLabel: {
-    color: Brand.charcoal,
-  },
-  divider: {
-    height: 1,
-    marginLeft: Spacing.three + 36 + Spacing.three,
-    backgroundColor: `${Brand.charcoal}12`,
   },
   staffBlock: {
     padding: Spacing.three,

@@ -8,6 +8,7 @@ describe('toRedemptionError', () => {
     ['ALREADY_REDEEMED', 'already_redeemed'],
     ['INELIGIBLE', 'ineligible'],
     ['NOT_AUTHENTICATED', 'not_authenticated'],
+    ['NOT_CLUB_MEMBER', 'not_club_member'],
   ])('maps a Postgres exception containing %s to code %s', (raised, expectedCode) => {
     const error = toRedemptionError({ message: raised });
     expect(error).toBeInstanceOf(RedemptionError);

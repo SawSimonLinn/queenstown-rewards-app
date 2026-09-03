@@ -2,7 +2,7 @@ import { StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { Card } from '@/components/ui/card';
-import { FoodImagePlaceholder } from '@/components/ui/food-image-placeholder';
+import { FadingImage } from '@/components/ui/fading-image';
 import { Brand, Spacing } from '@/constants/theme';
 import { formatDateRange } from '@/lib/format';
 import type { Special } from '@/types';
@@ -23,12 +23,13 @@ export function SpecialCard({ special, onPress, variant = 'compact' }: SpecialCa
       noPadding
       style={[styles.card, isFeature && styles.featureCard]}
     >
-      <FoodImagePlaceholder
+      <FadingImage
+        source={special.imageUrl}
         height={isFeature ? 132 : 96}
         radius={0}
-        icon="pricetag"
-        size="small"
-        label={isFeature ? 'Featured special' : undefined}
+        fallbackIcon="pricetag"
+        fallbackSize="small"
+        fallbackLabel={isFeature ? 'Featured special' : undefined}
       />
       <View style={[styles.body, isFeature && styles.featureBody]}>
         <ThemedText type={isFeature ? 'subtitle' : 'smallBold'} numberOfLines={isFeature ? 2 : 1}>

@@ -10,7 +10,7 @@ import { Spacing } from '@/constants/theme';
  * varies per device (0 on a Home-button iPhone, 34 on a Face ID iPhone,
  * varies again on Android) and must never be baked into a flat constant.
  */
-const TAB_BAR_CONTENT_HEIGHT = Platform.select({ ios: 49, android: 64, default: 49 });
+export const TAB_BAR_CONTENT_HEIGHT = Platform.select({ ios: 49, android: 64, default: 49 });
 
 /**
  * Bottom padding so a screen's content can scroll fully clear of the bottom

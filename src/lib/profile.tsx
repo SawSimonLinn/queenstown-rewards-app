@@ -3,6 +3,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useRef,
   useState,
   type PropsWithChildren,
 } from 'react';
@@ -14,7 +15,10 @@ import type { Profile } from '@/types';
 type ProfileContextValue = {
   profile: Profile | null;
   isLoading: boolean;
-  refetch: () => void;
+  refetch: () => Promise<void>;
+  refresh: () => Promise<void>;
+  isRefreshing: boolean;
+  refreshError: string | null;
 };
 
 const ProfileContext = createContext<ProfileContextValue | null>(null);
@@ -23,26 +27,59 @@ export function ProfileProvider({ children }: PropsWithChildren) {
   const { session } = useAuth();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [refreshError, setRefreshError] = useState<string | null>(null);
+  const isFetchingRef = useRef(false);
 
-  const fetchProfile = useCallback(async () => {
-    if (!session) {
-      setProfile(null);
-      setIsLoading(false);
-      return;
-    }
-    try {
-      const result = await getMyProfile();
-      setProfile(result);
-    } catch {
-      setProfile(null);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [session]);
+  const fetchProfile = useCallback(
+    async (mode: 'initial' | 'refresh' = 'initial') => {
+      if (isFetchingRef.current) return;
+      isFetchingRef.current = true;
+      const isRefresh = mode === 'refresh';
+      const message = "Couldn't load your profile. Check your connection and try again.";
 
-  const refetch = useCallback(() => {
-    setIsLoading(true);
-    fetchProfile();
+      if (isRefresh) {
+        setRefreshError(null);
+        setIsRefreshing(true);
+      } else {
+        setIsLoading(true);
+      }
+
+      if (!session) {
+        setProfile(null);
+        setIsLoading(false);
+        setRefreshError(null);
+        if (isRefresh) setIsRefreshing(false);
+        isFetchingRef.current = false;
+        return;
+      }
+
+      try {
+        const result = await getMyProfile();
+        setProfile(result);
+        setRefreshError(null);
+      } catch (error) {
+        console.error('Profile failed to load:', error);
+        if (isRefresh) {
+          setRefreshError(message);
+        } else {
+          setProfile(null);
+        }
+      } finally {
+        setIsLoading(false);
+        if (isRefresh) setIsRefreshing(false);
+        isFetchingRef.current = false;
+      }
+    },
+    [session]
+  );
+
+  const refetch = useCallback(async () => {
+    await fetchProfile(profile ? 'refresh' : 'initial');
+  }, [fetchProfile, profile]);
+
+  const refresh = useCallback(async () => {
+    await fetchProfile('refresh');
   }, [fetchProfile]);
 
   useEffect(() => {
@@ -55,7 +92,9 @@ export function ProfileProvider({ children }: PropsWithChildren) {
   }, [fetchProfile]);
 
   return (
-    <ProfileContext.Provider value={{ profile, isLoading, refetch }}>
+    <ProfileContext.Provider
+      value={{ profile, isLoading, refetch, refresh, isRefreshing, refreshError }}
+    >
       {children}
     </ProfileContext.Provider>
   );

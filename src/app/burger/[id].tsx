@@ -8,7 +8,8 @@ import { ThemedText } from '@/components/themed-text';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ErrorState } from '@/components/ui/error-state';
-import { FoodImagePlaceholder } from '@/components/ui/food-image-placeholder';
+import { FadingImage } from '@/components/ui/fading-image';
+import { FadeInView } from '@/components/ui/motion';
 import { ScreenContainer } from '@/components/ui/screen-container';
 import { HeroCardSkeleton } from '@/components/ui/skeleton';
 import { IS_SAMPLE_DATA, MAX_REDEMPTIONS_PER_PERIOD, REWARD_PERIOD } from '@/constants/app';
@@ -26,32 +27,34 @@ export default function BurgerOfMonthDetailScreen() {
   return (
     <ScreenContainer scroll edgeToEdge={state.status === 'success'}>
       {state.status === 'loading' && (
-        <View style={styles.padded}>
+        <FadeInView style={styles.padded}>
           <HeroCardSkeleton />
-        </View>
+        </FadeInView>
       )}
 
       {state.status === 'error' && (
-        <View style={styles.padded}>
+        <FadeInView style={styles.padded}>
           <ErrorState message={state.message} onRetry={retry} />
-        </View>
+        </FadeInView>
       )}
 
       {state.status === 'not-found' && (
-        <View style={styles.padded}>
+        <FadeInView style={styles.padded}>
           <Card accessibilityLabel="Campaign not found">
             <ThemedText themeColor="textSecondary">
               This Burger of the Month campaign couldn&apos;t be found. It may have ended.
             </ThemedText>
           </Card>
-        </View>
+        </FadeInView>
       )}
 
       {state.status === 'success' && (
-        <BurgerOfMonthDetail
-          data={state.data}
-          onRedeemPress={() => router.push('/redemption/confirm')}
-        />
+        <FadeInView slide layout>
+          <BurgerOfMonthDetail
+            data={state.data}
+            onRedeemPress={() => router.push('/redemption/confirm')}
+          />
+        </FadeInView>
       )}
     </ScreenContainer>
   );
@@ -70,11 +73,12 @@ function BurgerOfMonthDetail({ data, onRedeemPress }: BurgerOfMonthDetailProps) 
   return (
     <>
       <View style={styles.hero}>
-        <FoodImagePlaceholder
+        <FadingImage
+          source={campaign.imageUrl}
           height={300}
           radius={0}
-          icon="fast-food"
-          label="Burger of the Month"
+          fallbackIcon="fast-food"
+          fallbackLabel="Burger of the Month"
         />
       </View>
 
@@ -170,6 +174,7 @@ function BurgerOfMonthDetail({ data, onRedeemPress }: BurgerOfMonthDetailProps) 
             onPress={onRedeemPress}
             disabled={!canRedeem}
             size="large"
+            loadingLabel="Opening scanner"
             accessibilityHint={
               canRedeem
                 ? 'Opens the QR scanner to redeem this reward in store'

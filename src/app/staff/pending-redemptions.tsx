@@ -69,6 +69,7 @@ export default function PendingRedemptionsScreen() {
                 <Button
                   label="Confirm redemption"
                   loading={confirmingId === redemption.id}
+                  loadingLabel="Confirming"
                   onPress={() => confirm(redemption.id)}
                 />
               </Card>

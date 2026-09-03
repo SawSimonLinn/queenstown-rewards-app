@@ -1,8 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Image, Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { OpenStatusBadge } from '@/components/locations/open-status-badge';
+import { PreferredLocationStar } from '@/components/locations/preferred-location-star';
 import { ThemedText } from '@/components/themed-text';
+import { FadingImage } from '@/components/ui/fading-image';
 import { Brand, IconSize, Radius, Spacing } from '@/constants/theme';
 import { getLocationImages } from '@/data/location-images';
 import type { RestaurantLocation } from '@/data/types';
@@ -40,7 +42,15 @@ export function LocationListItem({
       ]}
     >
       {thumbnail ? (
-        <Image source={thumbnail} style={styles.thumbnail} accessibilityIgnoresInvertColors />
+        <FadingImage
+          source={thumbnail}
+          width={52}
+          height={52}
+          radius={Radius.medium}
+          fallbackIcon="storefront"
+          fallbackSize="small"
+          accessibilityIgnoresInvertColors
+        />
       ) : (
         <View style={styles.thumbnailFallback}>
           <ThemedText type="smallBold" style={styles.thumbnailInitial}>
@@ -82,7 +92,10 @@ export function LocationListItem({
         </View>
       </View>
 
-      <Ionicons name="chevron-forward" size={IconSize.medium} color={theme.textMuted} />
+      <View style={styles.trailing}>
+        <PreferredLocationStar location={location} size={20} />
+        <Ionicons name="chevron-forward" size={IconSize.medium} color={theme.textMuted} />
+      </View>
     </Pressable>
   );
 }
@@ -148,5 +161,9 @@ const styles = StyleSheet.create({
   },
   distance: {
     fontWeight: '700',
+  },
+  trailing: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 });

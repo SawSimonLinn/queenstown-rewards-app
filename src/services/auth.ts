@@ -36,3 +36,11 @@ export async function updatePassword(newPassword: string) {
   const { error } = await supabase.auth.updateUser({ password: newPassword });
   if (error) throw error;
 }
+
+// Supabase Auth handles the confirmation email(s) and the actual swap of
+// auth.users.email once confirmed — the client never writes auth.users
+// directly, and this never needs (or should use) a service-role key.
+export async function updateEmail(newEmail: string) {
+  const { error } = await supabase.auth.updateUser({ email: newEmail });
+  if (error) throw error;
+}

@@ -1,6 +1,12 @@
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { StyleSheet, View, type DimensionValue } from 'react-native';
+import {
+  StyleSheet,
+  View,
+  type DimensionValue,
+  type StyleProp,
+  type ViewStyle,
+} from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { OrganicEdge } from '@/components/ui/organic-edge';
@@ -8,13 +14,14 @@ import { Brand, IconSize, Radius, Spacing } from '@/constants/theme';
 
 export type FoodImagePlaceholderProps = {
   icon?: keyof typeof Ionicons.glyphMap;
-  height?: number;
+  height?: DimensionValue;
   width?: DimensionValue;
   radius?: number;
   label?: string;
   size?: 'small' | 'large';
   /** Warm (primary-led) or golden (secondary-led) — the same graphic in the app's two brand hues, for variety without new colours. */
   tone?: 'warm' | 'golden';
+  style?: StyleProp<ViewStyle>;
 };
 
 /**
@@ -32,6 +39,7 @@ export function FoodImagePlaceholder({
   label,
   size = 'large',
   tone = 'warm',
+  style,
 }: FoodImagePlaceholderProps) {
   const leadColor = tone === 'warm' ? Brand.primary : Brand.secondary;
   const gradientColors: [string, string] =
@@ -39,7 +47,7 @@ export function FoodImagePlaceholder({
 
   return (
     <View
-      style={[styles.container, { height, width, borderRadius: radius }]}
+      style={[styles.container, { height, width, borderRadius: radius }, style]}
       accessibilityLabel={label ?? 'Image not yet available'}
     >
       <LinearGradient

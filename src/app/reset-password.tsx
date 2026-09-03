@@ -200,6 +200,7 @@ export default function ResetPasswordScreen() {
         label="Update password"
         onPress={handleSubmit(onSubmit)}
         loading={isSubmitting}
+        loadingLabel="Updating"
         size="large"
       />
     </ScreenContainer>

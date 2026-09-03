@@ -1,12 +1,23 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import Animated, {
+  Easing,
+  cancelAnimation,
+  useAnimatedStyle,
+  useReducedMotion,
+  useSharedValue,
+  withRepeat,
+  withSequence,
+  withTiming,
+} from 'react-native-reanimated';
 
 import { ThemedText } from '@/components/themed-text';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ErrorState } from '@/components/ui/error-state';
+import { FadeInView, MotionDuration } from '@/components/ui/motion';
 import { ScreenContainer } from '@/components/ui/screen-container';
 import { Brand, IconSize, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
@@ -38,6 +49,10 @@ const REJECTION_COPY: Record<RedemptionErrorCode, { title: string; body: string 
   not_authenticated: {
     title: 'Sign in required',
     body: 'Please sign in again to redeem a reward.',
+  },
+  not_club_member: {
+    title: 'Join the Burger Club',
+    body: 'You need to join the Burger of the Month Club before you can redeem this code.',
   },
   unknown: {
     title: "Couldn't process this code",
@@ -97,36 +112,43 @@ export default function ReviewScreen() {
   return (
     <ScreenContainer scroll>
       {state.status === 'loading' && (
-        <Card accessibilityLabel="Checking QR code">
-          <ThemedText themeColor="textSecondary">Checking QR code…</ThemedText>
-        </Card>
+        <FadeInView>
+          <Card accessibilityLabel="Checking QR code">
+            <View style={styles.waitingRow}>
+              <ActivityIndicator size="small" color={Brand.primary} />
+              <ThemedText themeColor="textSecondary">Checking QR code…</ThemedText>
+            </View>
+          </Card>
+        </FadeInView>
       )}
 
       {state.status === 'network-error' && (
-        <>
+        <FadeInView style={styles.contentGroup}>
           <ErrorState message={state.message} onRetry={retry} />
           <Button label="Cancel" variant="outline" onPress={goHome} />
-        </>
+        </FadeInView>
       )}
 
       {state.status === 'rejected' &&
         (() => {
           const copy = REJECTION_COPY[state.code];
           return (
-            <Card accessibilityLabel={copy.title}>
-              <View style={styles.rejectionIconWrap}>
-                <Ionicons name="close" size={IconSize.xlarge} color={Brand.danger} />
-              </View>
-              <ThemedText type="subtitle">{copy.title}</ThemedText>
-              <ThemedText themeColor="textSecondary">{copy.body}</ThemedText>
-              <Button label="Scan again" onPress={scanAgain} />
-              <Button label="Cancel" variant="outline" onPress={goHome} />
-            </Card>
+            <FadeInView>
+              <Card accessibilityLabel={copy.title}>
+                <View style={styles.rejectionIconWrap}>
+                  <Ionicons name="close" size={IconSize.xlarge} color={Brand.danger} />
+                </View>
+                <ThemedText type="subtitle">{copy.title}</ThemedText>
+                <ThemedText themeColor="textSecondary">{copy.body}</ThemedText>
+                <Button label="Scan again" onPress={scanAgain} />
+                <Button label="Cancel" variant="outline" onPress={goHome} />
+              </Card>
+            </FadeInView>
           );
         })()}
 
       {state.status === 'pending' && !confirmedAt && (
-        <>
+        <FadeInView slide layout style={styles.contentGroup}>
           <ThemedText type="title">Show this to staff</ThemedText>
           <Card accessibilityLabel="Redemption summary">
             <ThemedText type="smallBold">{state.result.campaignName}</ThemedText>
@@ -151,26 +173,56 @@ export default function ReviewScreen() {
             label="Cancel request"
             variant="outline"
             loading={isCancelling}
+            loadingLabel="Cancelling"
             onPress={() => handleCancel(state.result.redemptionId)}
           />
-        </>
+        </FadeInView>
       )}
 
       {state.status === 'pending' && confirmedAt && (
-        <RedemptionSuccess
-          campaignName={state.result.campaignName}
-          locationName={state.result.locationName}
-          redemptionId={state.result.redemptionId}
-          confirmedAt={confirmedAt}
-          onDone={goHome}
-        />
+        <FadeInView slide layout style={styles.contentGroup}>
+          <RedemptionSuccess
+            campaignName={state.result.campaignName}
+            locationName={state.result.locationName}
+            redemptionId={state.result.redemptionId}
+            confirmedAt={confirmedAt}
+            onDone={goHome}
+          />
+        </FadeInView>
       )}
     </ScreenContainer>
   );
 }
 
 function PulsingDot() {
-  return <View style={styles.dot} />;
+  const reduceMotion = useReducedMotion();
+  const progress = useSharedValue(1);
+
+  useEffect(() => {
+    if (reduceMotion) {
+      cancelAnimation(progress);
+      progress.value = 1;
+      return;
+    }
+
+    progress.value = withRepeat(
+      withSequence(
+        withTiming(0.72, { duration: MotionDuration.slow, easing: Easing.inOut(Easing.quad) }),
+        withTiming(1, { duration: MotionDuration.slow, easing: Easing.inOut(Easing.quad) })
+      ),
+      -1,
+      false
+    );
+
+    return () => cancelAnimation(progress);
+  }, [progress, reduceMotion]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: progress.value,
+    transform: [{ scale: progress.value }],
+  }));
+
+  return <Animated.View style={[styles.dot, animatedStyle]} />;
 }
 
 function RedemptionSuccess({
@@ -238,6 +290,9 @@ function SuccessRow({
 }
 
 const styles = StyleSheet.create({
+  contentGroup: {
+    gap: Spacing.four,
+  },
   rejectionIconWrap: {
     width: 56,
     height: 56,

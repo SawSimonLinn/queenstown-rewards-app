@@ -12,6 +12,7 @@ export type ButtonProps = Omit<PressableProps, 'style' | 'children'> & {
   variant?: ButtonVariant;
   size?: ButtonSize;
   loading?: boolean;
+  loadingLabel?: string;
   accessibilityLabel?: string;
   fullWidth?: boolean;
 };
@@ -21,6 +22,7 @@ export function Button({
   variant = 'primary',
   size = 'default',
   loading = false,
+  loadingLabel,
   disabled,
   accessibilityLabel,
   fullWidth = true,
@@ -36,11 +38,13 @@ export function Button({
         : variant === 'outline'
           ? Brand.primaryDark
           : Brand.primary;
+  const spinnerColor = variant === 'primary' ? Brand.onPrimary : Brand.primary;
+  const visibleLabel = loading && loadingLabel ? loadingLabel : label;
 
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={accessibilityLabel ?? label}
+      accessibilityLabel={accessibilityLabel ?? visibleLabel}
       accessibilityState={{ disabled: isDisabled, busy: loading }}
       disabled={isDisabled}
       style={({ pressed }) => [
@@ -62,15 +66,15 @@ export function Button({
       ]}
       {...pressableProps}
     >
-      {loading ? (
-        <ActivityIndicator color={textColor} />
-      ) : (
-        <View style={styles.content}>
-          <ThemedText type="smallBold" style={{ color: textColor }}>
-            {label}
-          </ThemedText>
+      <View style={styles.content}>
+        <View style={styles.spinnerSlot}>
+          {loading && <ActivityIndicator size="small" color={spinnerColor} />}
         </View>
-      )}
+        <ThemedText type="smallBold" style={{ color: textColor }} numberOfLines={1}>
+          {visibleLabel}
+        </ThemedText>
+        <View style={styles.spinnerSlot} />
+      </View>
     </Pressable>
   );
 }
@@ -93,7 +97,15 @@ const styles = StyleSheet.create({
   content: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     gap: Spacing.two,
+    maxWidth: '100%',
+  },
+  spinnerSlot: {
+    width: 18,
+    height: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   raised: {
     ...Shadows.card,

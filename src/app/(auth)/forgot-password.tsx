@@ -93,6 +93,7 @@ export default function ForgotPasswordScreen() {
         label="Send reset link"
         onPress={handleSubmit(onSubmit)}
         loading={isSubmitting}
+        loadingLabel="Sending"
         size="large"
       />
 

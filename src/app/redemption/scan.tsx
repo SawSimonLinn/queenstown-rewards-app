@@ -10,6 +10,7 @@ import { Card } from '@/components/ui/card';
 import { ScreenContainer } from '@/components/ui/screen-container';
 import { Brand, IconSize, Radius, Spacing } from '@/constants/theme';
 import { usePreferredLocation } from '@/lib/preferred-location';
+import { getSupabaseLocationId } from '@/services/locations';
 
 export default function ScanScreen() {
   const router = useRouter();
@@ -77,9 +78,21 @@ export default function ScanScreen() {
         onBarcodeScanned={({ data }) => {
           if (hasScannedRef.current) return;
           hasScannedRef.current = true;
-          router.replace({
-            pathname: '/redemption/review',
-            params: { token: data, locationId: preferredLocation.id },
+
+          // request_redemption's p_location_id is the Supabase locations
+          // row (uuid) — preferredLocation.id is the local dataset's slug
+          // (src/data/locations.ts), so it has to be bridged first (see
+          // services/locations.ts) or every scan fails as a location
+          // mismatch against the QR code's real uuid.
+          getSupabaseLocationId(preferredLocation.id).then((supabaseLocationId) => {
+            if (!supabaseLocationId) {
+              hasScannedRef.current = false;
+              return;
+            }
+            router.replace({
+              pathname: '/redemption/review',
+              params: { token: data, locationId: supabaseLocationId },
+            });
           });
         }}
       />

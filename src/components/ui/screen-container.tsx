@@ -8,7 +8,7 @@ import { useTabBarBottomPadding } from '@/hooks/use-tab-bar-bottom-padding';
 export type ScreenContainerProps = ViewProps & {
   scroll?: boolean;
   /** Pull-to-refresh handler. Only applies when `scroll` is true. */
-  onRefresh?: () => void;
+  onRefresh?: () => void | Promise<void>;
   refreshing?: boolean;
   /** Removes the default horizontal padding — for edge-to-edge hero content. */
   edgeToEdge?: boolean;
