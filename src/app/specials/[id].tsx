@@ -1,0 +1,112 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useLocalSearchParams } from 'expo-router';
+import { StyleSheet, View } from 'react-native';
+
+import { ThemedText } from '@/components/themed-text';
+import { Card } from '@/components/ui/card';
+import { ErrorState } from '@/components/ui/error-state';
+import { FoodImagePlaceholder } from '@/components/ui/food-image-placeholder';
+import { ScreenContainer } from '@/components/ui/screen-container';
+import { HeroCardSkeleton } from '@/components/ui/skeleton';
+import { StatusBadge } from '@/components/ui/status-badge';
+import { Brand, IconSize, Spacing } from '@/constants/theme';
+import { useSpecialDetail } from '@/hooks/use-special-detail';
+import { formatDateRange } from '@/lib/format';
+import { getSpecialTiming } from '@/lib/special-timing';
+
+export default function SpecialDetailScreen() {
+  const { id } = useLocalSearchParams<{ id: string }>();
+  const { state, retry } = useSpecialDetail(id);
+
+  return (
+    <ScreenContainer scroll>
+      {state.status === 'loading' && <HeroCardSkeleton />}
+
+      {state.status === 'error' && <ErrorState message={state.message} onRetry={retry} />}
+
+      {state.status === 'not-found' && (
+        <Card accessibilityLabel="Special not found">
+          <ThemedText themeColor="textSecondary">
+            This special couldn&apos;t be found. It may have ended.
+          </ThemedText>
+        </Card>
+      )}
+
+      {state.status === 'success' &&
+        (() => {
+          const timing = getSpecialTiming(state.data.special);
+          return (
+            <>
+              <FoodImagePlaceholder height={190} icon="pricetag" label="Sample special photo" />
+
+              <View style={styles.headerRow}>
+                <ThemedText type="title" style={styles.title}>
+                  {state.data.special.title}
+                </ThemedText>
+                <StatusBadge label={timing.label} tone={timing.tone} />
+              </View>
+              <ThemedText themeColor="textSecondary">{state.data.special.description}</ThemedText>
+
+              <Card accessibilityLabel="Special dates">
+                <View style={styles.rowHeader}>
+                  <Ionicons name="calendar-outline" size={IconSize.medium} color={Brand.primary} />
+                  <ThemedText type="smallBold">Available</ThemedText>
+                </View>
+                <ThemedText themeColor="textSecondary">
+                  {formatDateRange(state.data.special.startDate, state.data.special.endDate)}
+                </ThemedText>
+              </Card>
+
+              <Card accessibilityLabel="Special locations">
+                <View style={styles.rowHeader}>
+                  <Ionicons name="location-outline" size={IconSize.medium} color={Brand.primary} />
+                  <ThemedText type="smallBold">Available at</ThemedText>
+                </View>
+                {state.data.locations.length === 0 ? (
+                  <ThemedText themeColor="textSecondary">All locations</ThemedText>
+                ) : (
+                  state.data.locations.map((location) => (
+                    <ThemedText key={location.id} themeColor="textSecondary">
+                      {location.name}
+                    </ThemedText>
+                  ))
+                )}
+              </Card>
+
+              <Card accessibilityLabel="Terms">
+                <View style={styles.rowHeader}>
+                  <Ionicons
+                    name="document-text-outline"
+                    size={IconSize.medium}
+                    color={Brand.primary}
+                  />
+                  <ThemedText type="smallBold">Terms</ThemedText>
+                </View>
+                <ThemedText themeColor="textSecondary">
+                  Cannot be combined with other offers. While stocks last at participating
+                  locations. Sample terms — not official Queenstown pricing.
+                </ThemedText>
+              </Card>
+            </>
+          );
+        })()}
+    </ScreenContainer>
+  );
+}
+
+const styles = StyleSheet.create({
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: Spacing.two,
+  },
+  title: {
+    flex: 1,
+  },
+  rowHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+});
