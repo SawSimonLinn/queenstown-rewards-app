@@ -20,6 +20,27 @@ export async function signInWithEmail(email: string, password: string) {
   return data;
 }
 
+// `fullName` is only ever supplied on a user's very first Apple
+// authorization (Apple never sends it again on later logins), so this is
+// the one chance to capture it into auth metadata. The profiles-table side
+// of the name capture is handled by the caller — see
+// src/components/auth/apple-continue.tsx — since it needs to check the
+// existing profile's current name before deciding whether to overwrite it.
+export async function signInWithApple(identityToken: string, nonce: string, fullName?: string) {
+  const { data, error } = await supabase.auth.signInWithIdToken({
+    provider: 'apple',
+    token: identityToken,
+    nonce,
+  });
+  if (error) throw error;
+
+  if (fullName) {
+    await supabase.auth.updateUser({ data: { full_name: fullName } });
+  }
+
+  return data;
+}
+
 export async function signOut() {
   const { error } = await supabase.auth.signOut();
   if (error) throw error;

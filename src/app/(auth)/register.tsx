@@ -6,6 +6,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
+import { AppleContinueSection } from '@/components/ui/apple-continue';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ScreenContainer } from '@/components/ui/screen-container';
@@ -156,6 +157,8 @@ export default function RegisterScreen() {
           size="large"
         />
       </View>
+
+      <AppleContinueSection onError={setFormError} />
 
       <Link href="/(auth)/login" asChild>
         <Pressable accessibilityRole="link" hitSlop={LinkHitSlop}>
