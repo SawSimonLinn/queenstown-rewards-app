@@ -25,7 +25,8 @@ import {
   SpecialCardSkeleton,
 } from '@/components/ui/skeleton';
 import { APP_NAME } from '@/constants/app';
-import { Brand, Spacing } from '@/constants/theme';
+import { Spacing } from '@/constants/theme';
+import { useBrand } from '@/hooks/use-brand';
 import type { RestaurantLocation } from '@/data/types';
 import { useHomeScreenData } from '@/hooks/use-home-screen-data';
 import { useLocationPromptDismissed } from '@/hooks/use-location-prompt-dismissed';
@@ -47,6 +48,7 @@ function greeting(): string {
 }
 
 export default function HomeScreen() {
+  const brand = useBrand();
   const { state, retry, refresh, isRefreshing, refreshError } = useHomeScreenData();
   const { preferredLocation } = usePreferredLocation();
   const { profile } = useProfileContext();
@@ -192,7 +194,7 @@ export default function HomeScreen() {
 
           <ThemedText
             type="linkPrimary"
-            style={styles.howItWorksLink}
+            style={[styles.howItWorksLink, { color: brand.primaryDark }]}
             onPress={() => router.push('/burger-club/how-it-works')}
           >
             How Burger of the Month works
@@ -323,6 +325,5 @@ const styles = StyleSheet.create({
   },
   howItWorksLink: {
     alignSelf: 'center',
-    color: Brand.primaryDark,
   },
 });

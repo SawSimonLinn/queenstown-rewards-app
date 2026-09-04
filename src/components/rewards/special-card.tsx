@@ -3,8 +3,9 @@ import { StyleSheet, View } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { Card } from '@/components/ui/card';
 import { FadingImage } from '@/components/ui/fading-image';
-import { Brand, Spacing } from '@/constants/theme';
+import { Spacing } from '@/constants/theme';
 import { pickStockImage, STOCK_SPECIAL_IMAGES } from '@/data/stock-images';
+import { useBrand } from '@/hooks/use-brand';
 import { formatDateRange } from '@/lib/format';
 import type { Special } from '@/types';
 
@@ -15,6 +16,7 @@ export type SpecialCardProps = {
 };
 
 export function SpecialCard({ special, onPress, variant = 'compact' }: SpecialCardProps) {
+  const brand = useBrand();
   const isFeature = variant === 'feature';
 
   return (
@@ -39,7 +41,7 @@ export function SpecialCard({ special, onPress, variant = 'compact' }: SpecialCa
         <ThemedText type="small" themeColor="textSecondary" numberOfLines={2}>
           {special.description}
         </ThemedText>
-        <ThemedText type="eyebrow" style={styles.dates}>
+        <ThemedText type="eyebrow" style={[styles.dates, { color: brand.primaryDark }]}>
           {formatDateRange(special.startDate, special.endDate)}
         </ThemedText>
       </View>
@@ -64,6 +66,5 @@ const styles = StyleSheet.create({
   },
   dates: {
     marginTop: 4,
-    color: Brand.primaryDark,
   },
 });

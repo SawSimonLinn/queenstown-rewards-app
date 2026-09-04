@@ -13,6 +13,7 @@ import { ScreenContainer } from '@/components/ui/screen-container';
 import { CardSkeleton } from '@/components/ui/skeleton';
 import { TextField } from '@/components/ui/text-field';
 import { Brand, IconSize, Radius, Spacing } from '@/constants/theme';
+import { useBrand } from '@/hooks/use-brand';
 import { useTheme } from '@/hooks/use-theme';
 import { QUEENSTOWN_LOCATIONS } from '@/data/locations';
 import {
@@ -36,6 +37,7 @@ export default function CampaignFormScreen() {
   const { id } = useLocalSearchParams<{ id?: string }>();
   const router = useRouter();
   const theme = useTheme();
+  const brand = useBrand();
   const isEditing = !!id;
   const [isLoadingExisting, setIsLoadingExisting] = useState(isEditing);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -264,12 +266,19 @@ export default function CampaignFormScreen() {
                   style={[
                     styles.statusChip,
                     { borderColor: theme.border },
-                    active && styles.statusChipActive,
+                    active && [
+                      styles.statusChipActive,
+                      { backgroundColor: brand.primary, borderColor: brand.primary },
+                    ],
                   ]}
                 >
                   <ThemedText
                     type="smallBold"
-                    style={active ? styles.statusLabelActive : { color: theme.textSecondary }}
+                    style={
+                      active
+                        ? [styles.statusLabelActive, { color: brand.onPrimary }]
+                        : { color: theme.textSecondary }
+                    }
                   >
                     {option[0].toUpperCase() + option.slice(1)}
                   </ThemedText>
@@ -294,7 +303,7 @@ export default function CampaignFormScreen() {
                 <Ionicons
                   name={selected ? 'checkbox' : 'square-outline'}
                   size={22}
-                  color={selected ? Brand.primary : Brand.charcoal}
+                  color={selected ? brand.primary : Brand.charcoal}
                 />
                 <ThemedText style={styles.locationLabel}>{location.name}</ThemedText>
               </Pressable>

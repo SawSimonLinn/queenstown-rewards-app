@@ -1,7 +1,8 @@
 import { ActivityIndicator, Pressable, StyleSheet, View, type PressableProps } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
-import { Brand, MinTouchTarget, Radius, Shadows, Spacing } from '@/constants/theme';
+import { MinTouchTarget, Radius, Shadows, Spacing } from '@/constants/theme';
+import { useBrand } from '@/hooks/use-brand';
 import { useTheme } from '@/hooks/use-theme';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost';
@@ -29,16 +30,17 @@ export function Button({
   ...pressableProps
 }: ButtonProps) {
   const theme = useTheme();
+  const brand = useBrand();
   const isDisabled = disabled || loading;
   const textColor =
     variant === 'primary'
-      ? Brand.onPrimary
+      ? brand.onPrimary
       : variant === 'secondary'
-        ? Brand.onSecondary
+        ? brand.onSecondary
         : variant === 'outline'
-          ? Brand.primaryDark
-          : Brand.primary;
-  const spinnerColor = variant === 'primary' ? Brand.onPrimary : Brand.primary;
+          ? brand.primaryDark
+          : brand.primary;
+  const spinnerColor = variant === 'primary' ? brand.onPrimary : brand.primary;
   const visibleLabel = loading && loadingLabel ? loadingLabel : label;
 
   return (
@@ -51,12 +53,12 @@ export function Button({
         styles.base,
         size === 'large' && styles.large,
         !fullWidth && styles.inline,
-        variant === 'primary' && [styles.raised, { backgroundColor: Brand.primary }],
-        variant === 'secondary' && { backgroundColor: Brand.secondary },
+        variant === 'primary' && [styles.raised, { backgroundColor: brand.primary }],
+        variant === 'secondary' && { backgroundColor: brand.secondary },
         variant === 'outline' && {
           backgroundColor: 'transparent',
           borderWidth: 1,
-          borderColor: Brand.primary,
+          borderColor: brand.primary,
         },
         variant === 'ghost' && {
           backgroundColor: theme.surfaceSunken,

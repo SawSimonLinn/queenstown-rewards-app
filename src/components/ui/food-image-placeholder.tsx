@@ -11,6 +11,7 @@ import {
 import { ThemedText } from '@/components/themed-text';
 import { OrganicEdge } from '@/components/ui/organic-edge';
 import { Brand, IconSize, Radius, Spacing } from '@/constants/theme';
+import { useBrand } from '@/hooks/use-brand';
 
 export type FoodImagePlaceholderProps = {
   icon?: keyof typeof Ionicons.glyphMap;
@@ -41,9 +42,10 @@ export function FoodImagePlaceholder({
   tone = 'warm',
   style,
 }: FoodImagePlaceholderProps) {
-  const leadColor = tone === 'warm' ? Brand.primary : Brand.secondary;
+  const brand = useBrand();
+  const leadColor = tone === 'warm' ? brand.primary : brand.secondary;
   const gradientColors: [string, string] =
-    tone === 'warm' ? [Brand.primary, Brand.primaryDark] : [Brand.secondary, Brand.secondaryDark];
+    tone === 'warm' ? [brand.primary, brand.primaryDark] : [brand.secondary, brand.secondaryDark];
 
   return (
     <View
@@ -71,7 +73,11 @@ export function FoodImagePlaceholder({
       </View>
       {label && (
         <View style={styles.caption}>
-          <ThemedText type="eyebrow" style={styles.label} numberOfLines={1}>
+          <ThemedText
+            type="eyebrow"
+            style={[styles.label, { color: brand.primaryDark }]}
+            numberOfLines={1}
+          >
             {label}
           </ThemedText>
         </View>

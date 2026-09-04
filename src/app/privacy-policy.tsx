@@ -7,6 +7,7 @@ import { ScreenContainer } from '@/components/ui/screen-container';
 import { SectionHeader } from '@/components/ui/section-header';
 import { APP_NAME } from '@/constants/app';
 import { Brand, Spacing } from '@/constants/theme';
+import { useBrand } from '@/hooks/use-brand';
 
 const LAST_UPDATED = 'September 2026';
 const SUPPORT_EMAIL = 'privacy@queenstownrewards.co.nz';
@@ -58,10 +59,11 @@ const SECTIONS: Section[] = [
 ];
 
 export default function PrivacyPolicyScreen() {
+  const brand = useBrand();
   return (
     <ScreenContainer scroll>
-      <View style={styles.iconWrap}>
-        <Ionicons name="shield-checkmark" size={28} color={Brand.primary} />
+      <View style={[styles.iconWrap, { backgroundColor: `${brand.primary}1A` }]}>
+        <Ionicons name="shield-checkmark" size={28} color={brand.primary} />
       </View>
       <ThemedText type="title" style={styles.center}>
         Privacy policy

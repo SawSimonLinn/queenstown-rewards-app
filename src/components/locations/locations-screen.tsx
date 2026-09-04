@@ -10,6 +10,7 @@ import { ScreenContainer } from '@/components/ui/screen-container';
 import { Brand, MaxContentWidth, MinTouchTarget, Radius, Spacing } from '@/constants/theme';
 import { QUEENSTOWN_LOCATIONS } from '@/data/locations';
 import type { RestaurantLocation } from '@/data/types';
+import { useBrand } from '@/hooks/use-brand';
 import { useTheme } from '@/hooks/use-theme';
 import { getDirectionsUrl, getFullAddress } from '@/lib/maps';
 import { getLocationStatus, hasBrunchService, hasHappyHourService } from '@/lib/schedule';
@@ -26,6 +27,7 @@ const FILTERS: { key: FilterKey; label: string }[] = [
 export default function LocationsWebScreen() {
   const router = useRouter();
   const theme = useTheme();
+  const brand = useBrand();
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState<FilterKey>('all');
 
@@ -71,10 +73,14 @@ export default function LocationsWebScreen() {
               'https://www.google.com/maps/search/?api=1&query=Queenstown%20Hospitality%20Group%20San%20Diego'
             )
           }
-          style={({ pressed }) => [styles.mapLink, pressed && styles.pressed]}
+          style={({ pressed }) => [
+            styles.mapLink,
+            { borderColor: `${brand.primary}33`, backgroundColor: brand.primaryTint },
+            pressed && styles.pressed,
+          ]}
         >
-          <Ionicons name="map" size={18} color={Brand.primary} />
-          <ThemedText type="smallBold" style={styles.mapLinkText}>
+          <Ionicons name="map" size={18} color={brand.primary} />
+          <ThemedText type="smallBold" style={{ color: brand.primary }}>
             Google Maps
           </ThemedText>
         </Pressable>
@@ -188,6 +194,7 @@ function WebLocationRow({
   location: RestaurantLocation;
   onPress: () => void;
 }) {
+  const brand = useBrand();
   return (
     <View style={styles.rowWrap}>
       <LocationListItem
@@ -201,10 +208,14 @@ function WebLocationRow({
           accessibilityRole="link"
           accessibilityLabel={`Open directions to ${location.name}`}
           onPress={() => Linking.openURL(getDirectionsUrl(location))}
-          style={({ pressed }) => [styles.actionButton, pressed && styles.pressed]}
+          style={({ pressed }) => [
+            styles.actionButton,
+            { backgroundColor: brand.primaryTint },
+            pressed && styles.pressed,
+          ]}
         >
-          <Ionicons name="navigate" size={16} color={Brand.primary} />
-          <ThemedText type="smallBold" style={styles.actionText}>
+          <Ionicons name="navigate" size={16} color={brand.primary} />
+          <ThemedText type="smallBold" style={{ color: brand.primary }}>
             Directions
           </ThemedText>
         </Pressable>
@@ -233,14 +244,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.three,
     borderRadius: Radius.pill,
     borderWidth: 1,
-    borderColor: `${Brand.primary}33`,
-    backgroundColor: Brand.primaryTint,
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.one,
-  },
-  mapLinkText: {
-    color: Brand.primary,
   },
   searchBar: {
     minHeight: 52,
@@ -296,13 +302,9 @@ const styles = StyleSheet.create({
     minHeight: 36,
     paddingHorizontal: Spacing.three,
     borderRadius: Radius.pill,
-    backgroundColor: Brand.primaryTint,
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.one,
-  },
-  actionText: {
-    color: Brand.primary,
   },
   pressed: {
     opacity: 0.7,

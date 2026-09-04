@@ -4,7 +4,8 @@ import { StyleSheet, View } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { Card } from '@/components/ui/card';
 import { StatusBadge } from '@/components/ui/status-badge';
-import { Brand, IconSize, Spacing } from '@/constants/theme';
+import { IconSize, Spacing } from '@/constants/theme';
+import { useBrand } from '@/hooks/use-brand';
 import { formatDate } from '@/lib/format';
 import type { ClubMembership } from '@/types';
 
@@ -13,10 +14,12 @@ export type MembershipStatusCardProps = {
 };
 
 export function MembershipStatusCard({ membership }: MembershipStatusCardProps) {
+  const brand = useBrand();
+
   return (
     <Card accessibilityLabel="Club Member">
       <View style={styles.row}>
-        <Ionicons name="ribbon" size={IconSize.medium} color={Brand.primary} />
+        <Ionicons name="ribbon" size={IconSize.medium} color={brand.primary} />
         <StatusBadge label="Club Member" tone="success" />
       </View>
       <ThemedText type="small" themeColor="textSecondary">

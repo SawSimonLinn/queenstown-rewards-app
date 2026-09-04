@@ -11,6 +11,7 @@ import { IS_SAMPLE_DATA } from '@/constants/app';
 import { Brand, Radius, Shadows, Spacing } from '@/constants/theme';
 import { pickStockImage, STOCK_BURGER_IMAGES } from '@/data/stock-images';
 import type { RestaurantLocation } from '@/data/types';
+import { useBrand } from '@/hooks/use-brand';
 import { isRedeemable } from '@/lib/eligibility';
 import { formatDate } from '@/lib/format';
 import type { BurgerCampaign, MonthlyEntitlement } from '@/types';
@@ -40,6 +41,7 @@ export function BurgerClubHero({
   ctaState,
   onCtaPress,
 }: BurgerClubHeroProps) {
+  const brand = useBrand();
   const canRedeem = entitlement ? isRedeemable(entitlement.status) : false;
   const ctaDisabled = ctaState === 'redeemed' || ctaState === 'no-campaign';
 
@@ -56,7 +58,7 @@ export function BurgerClubHero({
           />
         ) : (
           <LinearGradient
-            colors={[Brand.primary, Brand.primaryDark, Brand.secondary]}
+            colors={[brand.primary, brand.primaryDark, brand.secondary]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.heroFallback}
@@ -125,9 +127,17 @@ export function BurgerClubHero({
               {preferredLocation && <MetaItem label="Restaurant" value={preferredLocation.name} />}
             </View>
 
-            <View style={styles.requirementRow}>
-              <Ionicons name="restaurant-outline" size={16} color={Brand.primaryDark} />
-              <ThemedText type="smallBold" style={styles.requirementText}>
+            <View
+              style={[
+                styles.requirementRow,
+                { borderColor: `${brand.primary}33`, backgroundColor: brand.primaryTint },
+              ]}
+            >
+              <Ionicons name="restaurant-outline" size={16} color={brand.primaryDark} />
+              <ThemedText
+                type="smallBold"
+                style={[styles.requirementText, { color: brand.primaryDark }]}
+              >
                 With another qualifying entrée
               </ThemedText>
             </View>
@@ -267,13 +277,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: Spacing.two,
     borderWidth: 1,
-    borderColor: `${Brand.primary}33`,
-    backgroundColor: Brand.primaryTint,
     borderRadius: Radius.medium,
     padding: Spacing.three,
   },
   requirementText: {
-    color: Brand.primaryDark,
     flex: 1,
   },
   actions: {

@@ -3,7 +3,8 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import { OpenStatusBadge } from '@/components/locations/open-status-badge';
 import { ThemedText } from '@/components/themed-text';
-import { Brand, Spacing } from '@/constants/theme';
+import { Spacing } from '@/constants/theme';
+import { useBrand } from '@/hooks/use-brand';
 import { useTheme } from '@/hooks/use-theme';
 import type { RestaurantLocation } from '@/data/types';
 import { getLocationStatus } from '@/lib/schedule';
@@ -17,6 +18,7 @@ export type SelectedLocationCardProps = {
 export function SelectedLocationCard({ location, onPress }: SelectedLocationCardProps) {
   const status = getLocationStatus(location);
   const theme = useTheme();
+  const brand = useBrand();
 
   return (
     <Pressable
@@ -37,7 +39,7 @@ export function SelectedLocationCard({ location, onPress }: SelectedLocationCard
         </ThemedText>
       </View>
       <OpenStatusBadge status={status} />
-      {onPress && <Ionicons name="chevron-forward" size={18} color={Brand.primary} />}
+      {onPress && <Ionicons name="chevron-forward" size={18} color={brand.primary} />}
     </Pressable>
   );
 }

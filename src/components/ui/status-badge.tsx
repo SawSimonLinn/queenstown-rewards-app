@@ -2,7 +2,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
-import { Brand, Radius, Spacing } from '@/constants/theme';
+import { Radius, Spacing, type BrandPalette } from '@/constants/theme';
+import { useBrand } from '@/hooks/use-brand';
 
 export type StatusTone = 'success' | 'primary' | 'warning' | 'danger' | 'neutral';
 
@@ -14,13 +15,16 @@ export type StatusBadgeProps = {
   solid?: boolean;
 };
 
-export const TONE_COLOR: Record<StatusTone, string> = {
-  success: Brand.success,
-  primary: Brand.primary,
-  warning: Brand.warning,
-  danger: Brand.danger,
-  neutral: Brand.charcoal,
-};
+/** Resolves each status tone to a color from the active brand palette — pass `useBrand()`'s result so `primary` follows the signed-in role. */
+export function getToneColor(brand: BrandPalette): Record<StatusTone, string> {
+  return {
+    success: brand.success,
+    primary: brand.primary,
+    warning: brand.warning,
+    danger: brand.danger,
+    neutral: brand.charcoal,
+  };
+}
 
 const TONE_ICON: Record<StatusTone, keyof typeof Ionicons.glyphMap> = {
   success: 'checkmark-circle',
@@ -36,15 +40,16 @@ const TONE_ICON: Record<StatusTone, keyof typeof Ionicons.glyphMap> = {
  * without color perception.
  */
 export function StatusBadge({ label, tone, icon, solid = false }: StatusBadgeProps) {
-  const color = TONE_COLOR[tone];
-  const contentColor = solid ? Brand.onPrimary : color;
+  const brand = useBrand();
+  const color = getToneColor(brand)[tone];
+  const contentColor = solid ? brand.onPrimary : color;
 
   return (
     <View
       style={[
         styles.badge,
         solid
-          ? { backgroundColor: Brand.charcoal, borderColor: Brand.charcoal }
+          ? { backgroundColor: brand.charcoal, borderColor: brand.charcoal }
           : { backgroundColor: `${color}1F`, borderColor: `${color}55` },
       ]}
       accessibilityLabel={label}

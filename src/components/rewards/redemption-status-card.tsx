@@ -3,8 +3,9 @@ import { StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { Card } from '@/components/ui/card';
-import { StatusBadge, TONE_COLOR, type StatusTone } from '@/components/ui/status-badge';
+import { StatusBadge, getToneColor, type StatusTone } from '@/components/ui/status-badge';
 import { IconSize, Spacing } from '@/constants/theme';
+import { useBrand } from '@/hooks/use-brand';
 import { formatDate } from '@/lib/format';
 import type { MonthlyEntitlement } from '@/types';
 
@@ -34,12 +35,13 @@ function getNextRewardDate(periodMonth: string | undefined): Date {
  * backed by real Supabase data (never computed from local state alone).
  */
 export function RedemptionStatusCard({ entitlement }: RedemptionStatusCardProps) {
+  const brand = useBrand();
   const copy = STATUS_COPY[entitlement.status];
 
   return (
     <Card accessibilityLabel={`Monthly redemption: ${copy.label}`}>
       <View style={styles.row}>
-        <Ionicons name={copy.icon} size={IconSize.medium} color={TONE_COLOR[copy.tone]} />
+        <Ionicons name={copy.icon} size={IconSize.medium} color={getToneColor(brand)[copy.tone]} />
         <StatusBadge label={copy.label} tone={copy.tone} solid={copy.solid} />
       </View>
       <ThemedText type="small" themeColor="textSecondary">

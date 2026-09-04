@@ -8,6 +8,7 @@ import { Card } from '@/components/ui/card';
 import { Brand, IconSize, Radius, Spacing } from '@/constants/theme';
 import { QUEENSTOWN_LOCATIONS } from '@/data/locations';
 import type { RestaurantLocation } from '@/data/types';
+import { useBrand } from '@/hooks/use-brand';
 import { useTheme } from '@/hooks/use-theme';
 import { getFullAddress } from '@/lib/maps';
 
@@ -102,6 +103,7 @@ function LocationOptionRow({
   onPress: () => void;
 }) {
   const theme = useTheme();
+  const brand = useBrand();
   return (
     <Pressable
       accessibilityRole="radio"
@@ -110,8 +112,8 @@ function LocationOptionRow({
       onPress={onPress}
       style={({ pressed }) => [
         styles.row,
-        { borderColor: isSelected ? Brand.primary : theme.border },
-        isSelected && styles.rowSelected,
+        { borderColor: isSelected ? brand.primary : theme.border },
+        isSelected && [styles.rowSelected, { backgroundColor: `${brand.primary}0D` }],
         pressed && styles.pressed,
       ]}
     >
@@ -126,7 +128,7 @@ function LocationOptionRow({
       <Ionicons
         name={isSelected ? 'checkmark-circle' : 'ellipse-outline'}
         size={IconSize.medium}
-        color={isSelected ? Brand.primary : theme.textMuted}
+        color={isSelected ? brand.primary : theme.textMuted}
       />
     </Pressable>
   );

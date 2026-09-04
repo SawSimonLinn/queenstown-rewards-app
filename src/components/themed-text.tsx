@@ -1,6 +1,7 @@
 import { Platform, StyleSheet, Text, type TextProps } from 'react-native';
 
-import { Brand, DisplayFonts, Fonts, ThemeColor } from '@/constants/theme';
+import { DisplayFonts, Fonts, ThemeColor } from '@/constants/theme';
+import { useBrand } from '@/hooks/use-brand';
 import { useTheme } from '@/hooks/use-theme';
 
 export type ThemedTextProps = TextProps & {
@@ -21,6 +22,7 @@ export type ThemedTextProps = TextProps & {
 
 export function ThemedText({ style, type = 'default', themeColor, ...rest }: ThemedTextProps) {
   const theme = useTheme();
+  const brand = useBrand();
 
   return (
     <Text
@@ -35,7 +37,7 @@ export function ThemedText({ style, type = 'default', themeColor, ...rest }: The
         type === 'subtitle' && styles.subtitle,
         type === 'eyebrow' && [styles.eyebrow, { color: theme.textSecondary }],
         type === 'link' && styles.link,
-        type === 'linkPrimary' && styles.linkPrimary,
+        type === 'linkPrimary' && [styles.linkPrimary, { color: brand.primary }],
         type === 'code' && styles.code,
         style,
       ]}
@@ -99,7 +101,6 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     fontSize: 14,
     fontWeight: '700',
-    color: Brand.primary,
   },
   code: {
     fontFamily: Fonts.mono,

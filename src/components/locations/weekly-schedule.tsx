@@ -6,6 +6,7 @@ import { ThemedText } from '@/components/themed-text';
 import { FadeInView, MotionDuration } from '@/components/ui/motion';
 import { Brand, Radius, Spacing } from '@/constants/theme';
 import type { RestaurantLocation } from '@/data/types';
+import { useBrand } from '@/hooks/use-brand';
 import { getWeeklyScheduleRows, type ScheduleRow } from '@/lib/schedule';
 
 /** Today plus the next two days — enough to answer "is it open soon" without the full week. */
@@ -20,6 +21,7 @@ export function WeeklySchedule({
   expanded: boolean;
   onToggleExpanded: () => void;
 }) {
+  const brand = useBrand();
   const reduceMotion = useReducedMotion();
   const rows = getWeeklyScheduleRows(location);
   const layoutTransition = reduceMotion
@@ -57,13 +59,13 @@ export function WeeklySchedule({
           style={styles.toggleRow}
           hitSlop={8}
         >
-          <ThemedText type="small" style={styles.toggleLabel}>
+          <ThemedText type="small" style={[styles.toggleLabel, { color: brand.primary }]}>
             {expanded ? 'Show less' : 'View full schedule'}
           </ThemedText>
           <Ionicons
             name={expanded ? 'chevron-up' : 'chevron-down'}
             size={16}
-            color={Brand.primary}
+            color={brand.primary}
           />
         </Pressable>
       )}
@@ -72,14 +74,21 @@ export function WeeklySchedule({
 }
 
 function ScheduleRowItem({ row, isLast }: { row: ScheduleRow; isLast: boolean }) {
+  const brand = useBrand();
   return (
-    <View style={[styles.row, !isLast && styles.rowDivider, row.isToday && styles.rowToday]}>
+    <View
+      style={[
+        styles.row,
+        !isLast && styles.rowDivider,
+        row.isToday && [styles.rowToday, { backgroundColor: `${brand.primary}0D` }],
+      ]}
+    >
       <View style={styles.dayColumn}>
         <ThemedText type="smallBold" numberOfLines={1} style={styles.dayLabel}>
           {row.dayLabel}
         </ThemedText>
         {row.isToday && (
-          <ThemedText type="eyebrow" numberOfLines={1} style={styles.todayTag}>
+          <ThemedText type="eyebrow" numberOfLines={1} style={[styles.todayTag, { color: brand.primary }]}>
             Today
           </ThemedText>
         )}

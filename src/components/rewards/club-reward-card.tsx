@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { FadingImage } from '@/components/ui/fading-image';
 import { Brand, IconSize, Radius, Spacing } from '@/constants/theme';
+import { useBrand } from '@/hooks/use-brand';
 import { pickStockImage, STOCK_BURGER_IMAGES } from '@/data/stock-images';
 import { isRedeemable } from '@/lib/eligibility';
 import { formatDate } from '@/lib/format';
@@ -36,6 +37,7 @@ export function ClubRewardCard({
   onViewTermsPress,
   onViewDetailsPress,
 }: ClubRewardCardProps) {
+  const brand = useBrand();
   const canRedeem = isRedeemable(status);
   const isRedeemed = status === 'redeemed';
   const actionLabel = canRedeem
@@ -108,6 +110,8 @@ export function ClubRewardCard({
           label="Requirement"
           value="Purchase another qualifying entree"
           emphasized
+          emphasisColor={brand.primary}
+          emphasisTextColor={brand.primaryDark}
         />
       </View>
 
@@ -135,25 +139,32 @@ function PassLine({
   value,
   hint,
   emphasized,
+  emphasisColor,
+  emphasisTextColor,
 }: {
   icon: keyof typeof Ionicons.glyphMap;
   label: string;
   value: string;
   hint?: string;
   emphasized?: boolean;
+  emphasisColor?: string;
+  emphasisTextColor?: string;
 }) {
   return (
     <View style={styles.passLine}>
       <Ionicons
         name={icon}
         size={IconSize.medium}
-        color={emphasized ? Brand.primary : Brand.charcoal}
+        color={emphasized ? emphasisColor : Brand.charcoal}
       />
       <View style={styles.passLineText}>
         <ThemedText type="eyebrow" themeColor="textSecondary">
           {label}
         </ThemedText>
-        <ThemedText type="smallBold" style={emphasized ? styles.emphasizedText : undefined}>
+        <ThemedText
+          type="smallBold"
+          style={emphasized ? { color: emphasisTextColor } : undefined}
+        >
           {value}
         </ThemedText>
       </View>
@@ -254,9 +265,6 @@ const styles = StyleSheet.create({
   passLineText: {
     flex: 1,
     gap: 2,
-  },
-  emphasizedText: {
-    color: Brand.primaryDark,
   },
   actions: {
     padding: Spacing.three,

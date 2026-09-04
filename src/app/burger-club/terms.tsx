@@ -5,6 +5,7 @@ import { ThemedText } from '@/components/themed-text';
 import { Card } from '@/components/ui/card';
 import { ScreenContainer } from '@/components/ui/screen-container';
 import { Brand, Spacing } from '@/constants/theme';
+import { useBrand } from '@/hooks/use-brand';
 
 const TERMS: string[] = [
   'Club membership is required to participate in the Burger of the Month Club.',
@@ -25,10 +26,11 @@ const TERMS: string[] = [
 ];
 
 export default function ClubTermsScreen() {
+  const brand = useBrand();
   return (
     <ScreenContainer scroll>
-      <View style={styles.iconWrap}>
-        <Ionicons name="document-text" size={28} color={Brand.primary} />
+      <View style={[styles.iconWrap, { backgroundColor: `${brand.primary}1A` }]}>
+        <Ionicons name="document-text" size={28} color={brand.primary} />
       </View>
       <ThemedText type="title" style={styles.center}>
         Burger Club terms
@@ -46,7 +48,7 @@ export default function ClubTermsScreen() {
       <View style={styles.list}>
         {TERMS.map((term) => (
           <View key={term} style={styles.termRow}>
-            <View style={styles.bullet} />
+            <View style={[styles.bullet, { backgroundColor: brand.primary }]} />
             <ThemedText themeColor="textSecondary" style={styles.termText}>
               {term}
             </ThemedText>

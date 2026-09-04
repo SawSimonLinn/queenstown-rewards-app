@@ -1,5 +1,4 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
@@ -15,6 +14,7 @@ import { SegmentedControl } from '@/components/ui/segmented-control';
 import { ScreenContainer } from '@/components/ui/screen-container';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { Brand, IconSize, Radius, Shadows, Spacing } from '@/constants/theme';
+import { useBrand } from '@/hooks/use-brand';
 import { useTheme } from '@/hooks/use-theme';
 import { useStaffLocationOptions } from '@/hooks/use-staff-location-options';
 import {
@@ -27,7 +27,7 @@ import { REDEMPTION_STATUS_COPY } from '@/lib/redemption-status-copy';
 import type { StaffRedemption } from '@/services/staff';
 
 export default function RequestsScreen() {
-  const router = useRouter();
+  const brand = useBrand();
   const { profile } = useProfileContext();
   const [segment, setSegment] = useState<StaffRedemptionsSegment>('pending');
   const [locationId, setLocationId] = useState<string | null>(null);
@@ -40,7 +40,7 @@ export default function RequestsScreen() {
   if (profile && profile.role === 'customer') {
     return (
       <ScreenContainer>
-        <AppHeader eyebrow="Staff" title="Requests" onBackPress={() => router.back()} />
+        <AppHeader eyebrow="Staff" title="Requests" />
         <EmptyState
           icon="lock-closed-outline"
           title="Staff access only"
@@ -55,7 +55,7 @@ export default function RequestsScreen() {
 
   return (
     <ScreenContainer scroll onRefresh={retry} refreshing={state.status === 'loading'}>
-      <AppHeader eyebrow="Staff" title="Requests" onBackPress={() => router.back()} />
+      <AppHeader eyebrow="Staff" title="Requests" />
 
       <View style={styles.filters}>
         <SegmentedControl
@@ -90,7 +90,7 @@ export default function RequestsScreen() {
         ) : (
           locationOptions.length === 1 && (
             <View style={styles.singleLocationRow}>
-              <Ionicons name="storefront-outline" size={IconSize.small} color={Brand.primary} />
+              <Ionicons name="storefront-outline" size={IconSize.small} color={brand.primary} />
               <ThemedText type="small" themeColor="textSecondary">
                 {locationOptions[0].name}
               </ThemedText>
@@ -148,6 +148,7 @@ function LocationChip({
   onPress: () => void;
 }) {
   const theme = useTheme();
+  const brand = useBrand();
   return (
     <Pressable
       onPress={onPress}
@@ -156,12 +157,14 @@ function LocationChip({
       style={[
         styles.chip,
         { backgroundColor: theme.backgroundElement, borderColor: theme.border },
-        active && styles.chipActive,
+        active && { backgroundColor: brand.primary, borderColor: brand.primary },
       ]}
     >
       <ThemedText
         type="small"
-        style={active ? styles.chipLabelActive : { color: theme.textSecondary }}
+        style={
+          active ? { color: brand.onPrimary, fontWeight: '700' } : { color: theme.textSecondary }
+        }
       >
         {label}
       </ThemedText>
@@ -191,6 +194,7 @@ function RedemptionCard({
   onConfirm: () => void;
 }) {
   const theme = useTheme();
+  const brand = useBrand();
   const copy = REDEMPTION_STATUS_COPY[redemption.status];
 
   return (
@@ -201,8 +205,8 @@ function RedemptionCard({
       style={styles.card}
     >
       <View style={styles.cardHeader}>
-        <View style={styles.avatar}>
-          <ThemedText type="smallBold" style={styles.avatarText}>
+        <View style={[styles.avatar, { backgroundColor: brand.primaryTint }]}>
+          <ThemedText type="smallBold" style={{ color: brand.primaryDark }}>
             {initialsFor(redemption.customerName)}
           </ThemedText>
         </View>
@@ -273,14 +277,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     ...Shadows.card,
   },
-  chipActive: {
-    backgroundColor: Brand.primary,
-    borderColor: Brand.primary,
-  },
-  chipLabelActive: {
-    color: Brand.onPrimary,
-    fontWeight: '700',
-  },
   list: {
     gap: Spacing.three,
   },
@@ -297,12 +293,8 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: Radius.pill,
-    backgroundColor: Brand.primaryTint,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  avatarText: {
-    color: Brand.primaryDark,
   },
   cardHeaderText: {
     flex: 1,

@@ -63,7 +63,60 @@
           "locationWhenInUsePermission": "Queenstown Rewards uses your location to center the map and show distances to nearby locations. This is only requested when you tap \"Use My Location\"."
         }
       ],
-      "expo-font"
+      "expo-font",
+      [
+        "expo-alternate-app-icons",
+        [
+          {
+            "name": "Black",
+            "ios": "./assets/images/app-icons/icon-black.png",
+            "android": {
+              "foregroundImage": "./assets/images/app-icons/icon-black.png",
+              "backgroundColor": "#030303"
+            }
+          },
+          {
+            "name": "Blue",
+            "ios": "./assets/images/app-icons/icon-blue.png",
+            "android": {
+              "foregroundImage": "./assets/images/app-icons/icon-blue.png",
+              "backgroundColor": "#112442"
+            }
+          },
+          {
+            "name": "Green",
+            "ios": "./assets/images/app-icons/icon-green.png",
+            "android": {
+              "foregroundImage": "./assets/images/app-icons/icon-green.png",
+              "backgroundColor": "#0B3024"
+            }
+          },
+          {
+            "name": "Orange",
+            "ios": "./assets/images/app-icons/icon-orange.png",
+            "android": {
+              "foregroundImage": "./assets/images/app-icons/icon-orange.png",
+              "backgroundColor": "#D55F27"
+            }
+          },
+          {
+            "name": "Red",
+            "ios": "./assets/images/app-icons/icon-red.png",
+            "android": {
+              "foregroundImage": "./assets/images/app-icons/icon-red.png",
+              "backgroundColor": "#761E31"
+            }
+          },
+          {
+            "name": "White",
+            "ios": "./assets/images/app-icons/icon-white.png",
+            "android": {
+              "foregroundImage": "./assets/images/app-icons/icon-white.png",
+              "backgroundColor": "#F7E6CF"
+            }
+          }
+        ]
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

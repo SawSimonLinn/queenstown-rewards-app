@@ -6,7 +6,8 @@ import { useEffect, useState } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
-import { Brand, Colors } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
+import { useBrand } from '@/hooks/use-brand';
 import { useNotificationDeepLinks } from '@/hooks/use-notification-deep-links';
 import { AuthProvider, useAuth } from '@/lib/auth';
 import { MembershipProvider, useMembershipContext } from '@/lib/membership';
@@ -65,6 +66,7 @@ function RootLayoutNav() {
     setPendingLocationId,
   } = usePreferredLocation();
   const { isLoading: isMembershipLoading } = useMembershipContext();
+  const brand = useBrand();
   const colors = Colors.light;
   const router = useRouter();
   useNotificationDeepLinks(router);
@@ -123,7 +125,7 @@ function RootLayoutNav() {
       <Stack
         screenOptions={{
           headerShown: false,
-          headerTintColor: Brand.primary,
+          headerTintColor: brand.primary,
           headerStyle: { backgroundColor: colors.background },
           headerTitleStyle: { color: colors.text },
           contentStyle: { backgroundColor: colors.background },
@@ -157,7 +159,6 @@ function RootLayoutNav() {
             name="redemption/review"
             options={{ headerShown: true, headerTitle: 'Redemption result' }}
           />
-          <Stack.Screen name="staff/requests" options={{ headerShown: false }} />
           <Stack.Screen name="staff/my-location" options={{ headerShown: false }} />
           <Stack.Screen name="staff/manage" options={{ headerShown: false }} />
           <Stack.Screen
@@ -188,6 +189,10 @@ function RootLayoutNav() {
           <Stack.Screen
             name="preferred-location"
             options={{ headerShown: true, headerTitle: 'Preferred location' }}
+          />
+          <Stack.Screen
+            name="app-icon"
+            options={{ headerShown: true, headerTitle: 'App icon' }}
           />
           <Stack.Screen
             name="change-email"

@@ -14,6 +14,7 @@ import Animated, {
 import { ThemedText } from '@/components/themed-text';
 import { Brand, MinTouchTarget, Radius } from '@/constants/theme';
 import type { RestaurantLocation } from '@/data/types';
+import { useBrand } from '@/hooks/use-brand';
 import { useTheme } from '@/hooks/use-theme';
 import { useAuth } from '@/lib/auth';
 import { getErrorMessage } from '@/lib/errors';
@@ -43,6 +44,7 @@ export function PreferredLocationStar({
 }: PreferredLocationStarProps) {
   const router = useRouter();
   const theme = useTheme();
+  const brand = useBrand();
   const reduceMotion = useReducedMotion();
   const { session } = useAuth();
   const { preferredLocation, savePreferredLocation, setPendingLocationId } = usePreferredLocation();
@@ -114,21 +116,21 @@ export function PreferredLocationStar({
         ]}
       >
         {isSaving ? (
-          <ActivityIndicator size="small" color={Brand.primary} />
+          <ActivityIndicator size="small" color={brand.primary} />
         ) : (
           <Animated.View style={animatedIconStyle}>
             <Ionicons
               name={isPreferred ? 'star' : 'star-outline'}
               size={size}
               color={
-                isPreferred ? Brand.primary : variant === 'scrim' ? Brand.charcoal : theme.textMuted
+                isPreferred ? brand.primary : variant === 'scrim' ? Brand.charcoal : theme.textMuted
               }
             />
           </Animated.View>
         )}
       </Pressable>
       {showLabel && isPreferred && (
-        <ThemedText type="eyebrow" style={styles.label}>
+        <ThemedText type="eyebrow" style={[styles.label, { color: brand.primary }]}>
           Preferred location
         </ThemedText>
       )}
@@ -154,7 +156,6 @@ const styles = StyleSheet.create({
     opacity: 0.65,
   },
   label: {
-    color: Brand.primary,
     marginTop: -4,
   },
 });

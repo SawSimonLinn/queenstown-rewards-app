@@ -5,6 +5,7 @@ import { ThemedText } from '@/components/themed-text';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Brand, IconSize, Spacing } from '@/constants/theme';
+import { useBrand } from '@/hooks/use-brand';
 import type { BurgerCampaign } from '@/types';
 
 const BENEFITS = [
@@ -20,10 +21,11 @@ export type JoinClubCardProps = {
 };
 
 export function JoinClubCard({ campaign, onJoinPress, onViewTermsPress }: JoinClubCardProps) {
+  const brand = useBrand();
   return (
     <Card accessibilityLabel="Join the Burger of the Month Club">
       <View style={styles.headerRow}>
-        <Ionicons name="ribbon" size={IconSize.medium} color={Brand.primary} />
+        <Ionicons name="ribbon" size={IconSize.medium} color={brand.primary} />
         <ThemedText type="smallBold">Burger of the Month Club</ThemedText>
       </View>
 

@@ -14,6 +14,7 @@ import { FadeInView } from '@/components/ui/motion';
 import { HeroCardSkeleton } from '@/components/ui/skeleton';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { Brand, IconSize, Radius, Shadows, Spacing } from '@/constants/theme';
+import { useBrand } from '@/hooks/use-brand';
 import { pickStockImage, STOCK_SPECIAL_IMAGES } from '@/data/stock-images';
 import { useTabBarBottomPadding } from '@/hooks/use-tab-bar-bottom-padding';
 import { useSpecialDetail } from '@/hooks/use-special-detail';
@@ -39,6 +40,7 @@ function useGoBack() {
 export default function SpecialDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { state, retry } = useSpecialDetail(id);
+  const brand = useBrand();
   const goBack = useGoBack();
   const bottomPadding = useTabBarBottomPadding();
 
@@ -104,7 +106,7 @@ export default function SpecialDetailScreen() {
 
               <Card accessibilityLabel="Special dates">
                 <View style={styles.rowHeader}>
-                  <Ionicons name="calendar-outline" size={IconSize.medium} color={Brand.primary} />
+                  <Ionicons name="calendar-outline" size={IconSize.medium} color={brand.primary} />
                   <ThemedText type="smallBold">Available</ThemedText>
                 </View>
                 <ThemedText themeColor="textSecondary">
@@ -114,7 +116,7 @@ export default function SpecialDetailScreen() {
 
               <Card accessibilityLabel="Special locations">
                 <View style={styles.rowHeader}>
-                  <Ionicons name="location-outline" size={IconSize.medium} color={Brand.primary} />
+                  <Ionicons name="location-outline" size={IconSize.medium} color={brand.primary} />
                   <ThemedText type="smallBold">Available at</ThemedText>
                 </View>
                 {state.data.locations.length === 0 ? (
@@ -133,7 +135,7 @@ export default function SpecialDetailScreen() {
                   <Ionicons
                     name="document-text-outline"
                     size={IconSize.medium}
-                    color={Brand.primary}
+                    color={brand.primary}
                   />
                   <ThemedText type="smallBold">Terms</ThemedText>
                 </View>

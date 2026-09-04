@@ -16,6 +16,7 @@ import { HeroCardSkeleton } from '@/components/ui/skeleton';
 import { IS_SAMPLE_DATA, MAX_REDEMPTIONS_PER_PERIOD, REWARD_PERIOD } from '@/constants/app';
 import { Brand, IconSize, Radius, Spacing } from '@/constants/theme';
 import { pickStockImage, STOCK_BURGER_IMAGES } from '@/data/stock-images';
+import { useBrand } from '@/hooks/use-brand';
 import { useBurgerCampaignDetail } from '@/hooks/use-burger-campaign-detail';
 import { isRedeemable } from '@/lib/eligibility';
 import { formatDateRange } from '@/lib/format';
@@ -68,13 +69,14 @@ type BurgerOfMonthDetailProps = {
 };
 
 function BurgerOfMonthDetail({ data, onRedeemPress }: BurgerOfMonthDetailProps) {
+  const brand = useBrand();
   const { campaign, entitlement, participatingLocations } = data;
   const status = entitlement?.status ?? 'ineligible';
   const canRedeem = isRedeemable(status);
 
   return (
     <>
-      <View style={styles.hero}>
+      <View style={[styles.hero, { backgroundColor: brand.primaryTint }]}>
         <FadingImage
           source={campaign.imageUrl ?? pickStockImage(STOCK_BURGER_IMAGES, campaign.id)}
           height={300}
@@ -96,7 +98,7 @@ function BurgerOfMonthDetail({ data, onRedeemPress }: BurgerOfMonthDetailProps) 
 
         <View style={styles.heroContent}>
           <View style={styles.passRow}>
-            <View style={styles.passStamp}>
+            <View style={[styles.passStamp, { backgroundColor: brand.primary }]}>
               <Ionicons name="ribbon" size={16} color={Brand.onPrimary} />
               <ThemedText type="eyebrow" style={styles.passStampText}>
                 Monthly campaign
@@ -125,13 +127,21 @@ function BurgerOfMonthDetail({ data, onRedeemPress }: BurgerOfMonthDetailProps) 
           </View>
         )}
 
-        <View style={styles.requirementPanel}>
-          <Ionicons name="restaurant-outline" size={IconSize.large} color={Brand.primaryDark} />
+        <View
+          style={[
+            styles.requirementPanel,
+            { borderColor: `${brand.primary}40`, backgroundColor: brand.primaryTint },
+          ]}
+        >
+          <Ionicons name="restaurant-outline" size={IconSize.large} color={brand.primaryDark} />
           <View style={styles.requirementTextGroup}>
-            <ThemedText type="smallBold" style={styles.requirementTitle}>
+            <ThemedText
+              type="smallBold"
+              style={[styles.requirementTitle, { color: brand.primaryDark }]}
+            >
               Qualifying entree required
             </ThemedText>
-            <ThemedText type="small" style={styles.requirementCopy}>
+            <ThemedText type="small" style={[styles.requirementCopy, { color: brand.primaryDark }]}>
               Redeem this burger with the purchase of another qualifying entree at a participating
               location.
             </ThemedText>
@@ -160,7 +170,7 @@ function BurgerOfMonthDetail({ data, onRedeemPress }: BurgerOfMonthDetailProps) 
 
         <View style={styles.locationsSection} accessibilityLabel="Participating locations">
           <View style={styles.sectionHeadingRow}>
-            <Ionicons name="location-outline" size={IconSize.medium} color={Brand.primary} />
+            <Ionicons name="location-outline" size={IconSize.medium} color={brand.primary} />
             <ThemedText type="smallBold">Participating locations</ThemedText>
           </View>
           {participatingLocations.length === 0 ? (
@@ -216,10 +226,11 @@ function InfoRow({
   label: string;
   children: ReactNode;
 }) {
+  const brand = useBrand();
   return (
     <View style={styles.infoRow}>
-      <View style={styles.infoIconWrap}>
-        <Ionicons name={icon} size={IconSize.medium} color={Brand.primary} />
+      <View style={[styles.infoIconWrap, { backgroundColor: `${brand.primary}1A` }]}>
+        <Ionicons name={icon} size={IconSize.medium} color={brand.primary} />
       </View>
       <View style={styles.infoTextGroup}>
         <ThemedText type="smallBold">{label}</ThemedText>

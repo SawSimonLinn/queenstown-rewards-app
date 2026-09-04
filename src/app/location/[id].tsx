@@ -24,6 +24,7 @@ import { Brand, IconSize, MinTouchTarget, Radius, Shadows, Spacing } from '@/con
 import { getRestaurantLocationById } from '@/data/locations';
 import { getLocationImages } from '@/data/location-images';
 import type { RestaurantLocation } from '@/data/types';
+import { useBrand } from '@/hooks/use-brand';
 import { useTabBarBottomPadding } from '@/hooks/use-tab-bar-bottom-padding';
 import { getDirectionsUrl, getFullAddress, getPhoneCallUrl } from '@/lib/maps';
 import {
@@ -92,6 +93,7 @@ function LocationDetail({
   bottomPadding: number;
 }) {
   const router = useRouter();
+  const brand = useBrand();
   const goBack = useGoBackToLocations();
   const status = getLocationStatus(location);
   const images = getLocationImages(location.id);
@@ -215,10 +217,15 @@ function LocationDetail({
           </View>
 
           {/* Burger Club */}
-          <View style={styles.clubCard}>
+          <View
+            style={[
+              styles.clubCard,
+              { borderColor: `${brand.secondary}55`, backgroundColor: `${brand.secondary}14` },
+            ]}
+          >
             <View style={styles.clubHeaderRow}>
-              <Ionicons name="gift" size={IconSize.medium} color={Brand.secondaryDark} />
-              <ThemedText type="smallBold" style={styles.clubTitle}>
+              <Ionicons name="gift" size={IconSize.medium} color={brand.secondaryDark} />
+              <ThemedText type="smallBold" style={[styles.clubTitle, { color: brand.secondaryDark }]}>
                 Burger of the Month Club
               </ThemedText>
             </View>
@@ -236,9 +243,9 @@ function LocationDetail({
                 onPress={() => router.push('/(tabs)/rewards')}
                 accessibilityRole="button"
                 accessibilityLabel="View reward"
-                style={styles.clubActionButton}
+                style={[styles.clubActionButton, { backgroundColor: brand.secondary }]}
               >
-                <ThemedText type="smallBold" style={styles.clubActionLabel}>
+                <ThemedText type="smallBold" style={[styles.clubActionLabel, { color: brand.onSecondary }]}>
                   View Reward
                 </ThemedText>
               </Pressable>
@@ -246,9 +253,9 @@ function LocationDetail({
                 onPress={() => router.push('/burger-club/terms')}
                 accessibilityRole="button"
                 accessibilityLabel="View terms"
-                style={styles.clubActionButtonGhost}
+                style={[styles.clubActionButtonGhost, { borderColor: brand.secondaryDark }]}
               >
-                <ThemedText type="smallBold" style={styles.clubActionGhostLabel}>
+                <ThemedText type="smallBold" style={[styles.clubActionGhostLabel, { color: brand.secondaryDark }]}>
                   View Terms
                 </ThemedText>
               </Pressable>
@@ -383,10 +390,11 @@ function Section({
   icon: keyof typeof Ionicons.glyphMap;
   children: ReactNode;
 }) {
+  const brand = useBrand();
   return (
     <View style={styles.section}>
       <View style={styles.sectionHeader}>
-        <Ionicons name={icon} size={IconSize.medium} color={Brand.primary} />
+        <Ionicons name={icon} size={IconSize.medium} color={brand.primary} />
         <ThemedText type="smallBold">{title}</ThemedText>
       </View>
       <View style={styles.sectionBody}>{children}</View>
@@ -416,15 +424,20 @@ function ActionButton({
   label: string;
   onPress: () => void;
 }) {
+  const brand = useBrand();
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={label}
       onPress={onPress}
-      style={({ pressed }) => [styles.actionButton, pressed && styles.pressedAction]}
+      style={({ pressed }) => [
+        styles.actionButton,
+        { borderColor: `${brand.primary}40` },
+        pressed && styles.pressedAction,
+      ]}
     >
-      <Ionicons name={icon} size={IconSize.medium} color={Brand.primary} />
-      <ThemedText type="smallBold" style={styles.actionLabel}>
+      <Ionicons name={icon} size={IconSize.medium} color={brand.primary} />
+      <ThemedText type="smallBold" style={[styles.actionLabel, { color: brand.primaryDark }]}>
         {label}
       </ThemedText>
     </Pressable>

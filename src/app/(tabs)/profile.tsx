@@ -17,6 +17,7 @@ import { SettingsRow, SettingsRowDivider } from '@/components/ui/settings-row';
 import { ProfileSkeleton } from '@/components/ui/skeleton';
 import { APP_NAME } from '@/constants/app';
 import { Brand, IconSize, Radius, Spacing } from '@/constants/theme';
+import { useBrand } from '@/hooks/use-brand';
 import { useMembership } from '@/hooks/use-membership';
 import { useAuth } from '@/lib/auth';
 import { registerForPushNotificationsAsync } from '@/lib/notifications';
@@ -29,6 +30,7 @@ type PushToggleState = 'checking' | 'enabled' | 'disabled';
 const IS_WEB = Platform.OS === 'web';
 
 export default function ProfileScreen() {
+  const brand = useBrand();
   const { session } = useAuth();
   const {
     profile,
@@ -157,7 +159,7 @@ export default function ProfileScreen() {
             onPress={() => router.push('/account-settings')}
           >
             <View style={styles.identityRow}>
-              <View style={styles.avatar}>
+              <View style={[styles.avatar, { backgroundColor: brand.primary }]}>
                 <ThemedText type="subtitle" style={styles.avatarText}>
                   {initials}
                 </ThemedText>
@@ -173,7 +175,7 @@ export default function ProfileScreen() {
                   {session?.user.email}
                 </ThemedText>
               </View>
-              <Ionicons name="chevron-forward" size={IconSize.medium} color={Brand.primary} />
+              <Ionicons name="chevron-forward" size={IconSize.medium} color={brand.primary} />
             </View>
           </Card>
 
@@ -218,7 +220,7 @@ export default function ProfileScreen() {
               <SettingsRow
                 icon="qr-code-outline"
                 label="Requests"
-                onPress={() => router.push('/staff/requests')}
+                onPress={() => router.push('/(tabs)/requests')}
               />
               <SettingsRowDivider />
               <SettingsRow
@@ -248,10 +250,10 @@ export default function ProfileScreen() {
                 onValueChange={handleTogglePush}
                 disabled={isTogglingPush || pushState === 'checking'}
                 accessibilityLabel="Push notifications"
-                trackColor={{ true: Brand.primary }}
+                trackColor={{ true: brand.primary }}
               />
               {(isTogglingPush || pushState === 'checking') && (
-                <ActivityIndicator size="small" color={Brand.primary} />
+                <ActivityIndicator size="small" color={brand.primary} />
               )}
             </View>
             {pushError && (
@@ -314,7 +316,6 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: Radius.medium,
-    backgroundColor: Brand.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },

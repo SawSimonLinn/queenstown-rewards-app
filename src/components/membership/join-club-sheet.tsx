@@ -5,6 +5,7 @@ import { Modal, Pressable, StyleSheet, View } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { Button } from '@/components/ui/button';
 import { Brand, Radius, Shadows, Spacing } from '@/constants/theme';
+import { useBrand } from '@/hooks/use-brand';
 import { useTheme } from '@/hooks/use-theme';
 
 export type JoinClubSheetProps = {
@@ -21,6 +22,7 @@ export function JoinClubSheet({
   onViewTermsPress,
 }: JoinClubSheetProps) {
   const theme = useTheme();
+  const brand = useBrand();
   const [agreed, setAgreed] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -83,7 +85,7 @@ export function JoinClubSheet({
             <Ionicons
               name={agreed ? 'checkbox' : 'square-outline'}
               size={22}
-              color={agreed ? Brand.primary : theme.text}
+              color={agreed ? brand.primary : theme.text}
             />
             <ThemedText style={styles.checkboxLabel}>
               I agree to the Burger of the Month Club Terms

@@ -1,18 +1,23 @@
 import { Ionicons } from '@expo/vector-icons';
 import { NativeTabs } from 'expo-router/unstable-native-tabs';
 
-import { Brand, Colors } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
+import { useBrand } from '@/hooks/use-brand';
+import { useProfileContext } from '@/lib/profile';
 
 export default function AppTabs() {
   const colors = Colors.light;
+  const brand = useBrand();
+  const { profile } = useProfileContext();
+  const isStaff = !!profile && profile.role !== 'customer';
 
   const sharedProps = {
     backgroundColor: colors.backgroundElement,
     indicatorColor: colors.backgroundSelected,
-    iconColor: { default: colors.textSecondary, selected: Brand.primary },
+    iconColor: { default: colors.textSecondary, selected: brand.primary },
     labelStyle: {
       default: { color: colors.textSecondary },
-      selected: { color: Brand.primary },
+      selected: { color: brand.primary },
     },
   } as const;
 
@@ -29,6 +34,15 @@ export default function AppTabs() {
         <NativeTabs.Trigger.Label>Locations</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon
           src={<NativeTabs.Trigger.VectorIcon family={Ionicons} name="location" />}
+        />
+      </NativeTabs.Trigger>
+
+      {/* Staff-only, centered deliberately between Locations and Rewards so it
+          lands in the middle of the bar once this fifth tab is present. */}
+      <NativeTabs.Trigger name="requests" hidden={!isStaff}>
+        <NativeTabs.Trigger.Label>Requests</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon
+          src={<NativeTabs.Trigger.VectorIcon family={Ionicons} name="qr-code" />}
         />
       </NativeTabs.Trigger>
 

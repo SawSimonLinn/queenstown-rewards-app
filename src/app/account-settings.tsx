@@ -51,6 +51,12 @@ export default function AccountSettingsScreen() {
                 }
                 onPress={() => router.push('/preferred-location')}
               />
+              <SettingsRowDivider />
+              <SettingsRow
+                icon="color-palette-outline"
+                label="App icon"
+                onPress={() => router.push('/app-icon')}
+              />
             </Card>
           </View>
 

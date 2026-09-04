@@ -16,6 +16,7 @@ import { FadeInView } from '@/components/ui/motion';
 import { Brand, MinTouchTarget, Radius, Shadows, Spacing } from '@/constants/theme';
 import { QUEENSTOWN_LOCATIONS } from '@/data/locations';
 import type { RestaurantLocation } from '@/data/types';
+import { useBrand } from '@/hooks/use-brand';
 import { TAB_BAR_CONTENT_HEIGHT, useTabBarBottomPadding } from '@/hooks/use-tab-bar-bottom-padding';
 import { useSafePush } from '@/hooks/use-safe-push';
 import { useTheme } from '@/hooks/use-theme';
@@ -87,6 +88,7 @@ function useSheetSnapPoints() {
 export default function LocationsScreen() {
   const { push } = useSafePush();
   const theme = useTheme();
+  const brand = useBrand();
   const insets = useSafeAreaInsets();
   const tabBarBottomPadding = useTabBarBottomPadding();
 
@@ -294,7 +296,7 @@ export default function LocationsScreen() {
                 style={[
                   styles.filterChip,
                   { backgroundColor: theme.backgroundElement, borderColor: theme.border },
-                  active && { backgroundColor: Brand.primary, borderColor: Brand.primary },
+                  active && { backgroundColor: brand.primary, borderColor: brand.primary },
                 ]}
               >
                 <ThemedText
@@ -344,7 +346,7 @@ export default function LocationsScreen() {
             accessibilityLabel={`View details for ${previewLocation.name}`}
             style={({ pressed }) => [styles.previewPressable, pressed && styles.previewPressed]}
           >
-            <View style={styles.previewRule} />
+            <View style={[styles.previewRule, { backgroundColor: brand.primary }]} />
             <View style={styles.previewText}>
               <ThemedText type="eyebrow">Selected restaurant</ThemedText>
               <ThemedText type="smallBold">{previewLocation.name}</ThemedText>
@@ -354,7 +356,7 @@ export default function LocationsScreen() {
             </View>
             <OpenStatusBadge status={getLocationStatus(previewLocation)} />
             <PreferredLocationStar location={previewLocation} size={20} />
-            <Ionicons name="chevron-forward" size={18} color={Brand.primary} />
+            <Ionicons name="chevron-forward" size={18} color={brand.primary} />
           </Pressable>
         </FadeInView>
       )}
@@ -413,6 +415,7 @@ function MapControlButton({
   accessibilityLabel: string;
   onPress: () => void;
 }) {
+  const brand = useBrand();
   return (
     <Pressable
       accessibilityRole="button"
@@ -420,7 +423,7 @@ function MapControlButton({
       onPress={onPress}
       style={({ pressed }) => [styles.controlButton, pressed && styles.controlButtonPressed]}
     >
-      <Ionicons name={icon} size={22} color={Brand.primary} />
+      <Ionicons name={icon} size={22} color={brand.primary} />
     </Pressable>
   );
 }
@@ -509,7 +512,6 @@ const styles = StyleSheet.create({
     width: 4,
     alignSelf: 'stretch',
     borderRadius: Radius.pill,
-    backgroundColor: Brand.primary,
   },
   previewText: {
     flex: 1,

@@ -53,6 +53,28 @@ export const Brand = {
   mutedSurface: '#F1EFEC',
 } as const;
 
+export type BrandPalette = { [K in keyof typeof Brand]: string };
+
+/**
+ * Staff/admin palette — swaps the warm orange-red customer identity for a
+ * cool blue one, so staff can tell at a glance they're in staff mode. Status
+ * colors (success/danger) are semantic, not identity, so they stay the
+ * same — but `warning` also gets a blue swap here, since it drives the
+ * "pending"/"awaiting confirmation" badge staff see constantly and an
+ * orange badge on an otherwise all-blue screen read like a UI mistake.
+ * Read via `useBrand()`, never imported directly — see src/hooks/use-brand.ts.
+ */
+export const StaffBrand: BrandPalette = {
+  ...Brand,
+  primary: '#1D4ED8',
+  primaryDark: '#1E3A8A',
+  primaryTint: '#DBEAFE',
+  secondary: '#0D9488',
+  secondaryDark: '#0F766E',
+  onSecondary: '#FFFFFF',
+  warning: '#2563EB',
+};
+
 export const Radius = {
   small: 8,
   medium: 12,

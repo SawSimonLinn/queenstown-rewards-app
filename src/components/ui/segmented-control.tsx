@@ -1,7 +1,8 @@
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
-import { Brand, Radius, Spacing } from '@/constants/theme';
+import { Radius, Spacing } from '@/constants/theme';
+import { useBrand } from '@/hooks/use-brand';
 import { useTheme } from '@/hooks/use-theme';
 
 export type SegmentedControlOption<T extends string> = { key: T; label: string };
@@ -18,6 +19,7 @@ export function SegmentedControl<T extends string>({
   onChange,
 }: SegmentedControlProps<T>) {
   const theme = useTheme();
+  const brand = useBrand();
 
   return (
     <View style={styles.row}>
@@ -29,11 +31,15 @@ export function SegmentedControl<T extends string>({
             onPress={() => onChange(option.key)}
             accessibilityRole="button"
             accessibilityState={{ selected: active }}
-            style={[styles.button, { borderColor: theme.border }, active && styles.buttonActive]}
+            style={[
+              styles.button,
+              { borderColor: theme.border },
+              active && { backgroundColor: brand.primary, borderColor: brand.primary },
+            ]}
           >
             <ThemedText
               type="smallBold"
-              style={active ? styles.labelActive : { color: theme.textSecondary }}
+              style={active ? { color: brand.onPrimary } : { color: theme.textSecondary }}
             >
               {option.label}
             </ThemedText>
@@ -55,12 +61,5 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.two,
     borderRadius: Radius.medium,
     borderWidth: 1,
-  },
-  buttonActive: {
-    backgroundColor: Brand.primary,
-    borderColor: Brand.primary,
-  },
-  labelActive: {
-    color: Brand.onPrimary,
   },
 });

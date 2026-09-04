@@ -11,12 +11,14 @@ import { Card } from '@/components/ui/card';
 import { ScreenContainer } from '@/components/ui/screen-container';
 import { TextField } from '@/components/ui/text-field';
 import { Brand, Spacing } from '@/constants/theme';
+import { useBrand } from '@/hooks/use-brand';
 import { useAuth } from '@/lib/auth';
 import { createChangeEmailSchema, type ChangeEmailFormValues } from '@/lib/validation/profile';
 import { updateEmail } from '@/services/auth';
 
 export default function ChangeEmailScreen() {
   const router = useRouter();
+  const brand = useBrand();
   const { session } = useAuth();
   const currentEmail = session?.user.email ?? '';
   const [formError, setFormError] = useState<string | null>(null);
@@ -46,8 +48,8 @@ export default function ChangeEmailScreen() {
   if (requested) {
     return (
       <ScreenContainer>
-        <View style={styles.iconWrap}>
-          <Ionicons name="mail-open-outline" size={32} color={Brand.primary} />
+        <View style={[styles.iconWrap, { backgroundColor: `${brand.primary}1A` }]}>
+          <Ionicons name="mail-open-outline" size={32} color={brand.primary} />
         </View>
         <ThemedText type="title" style={styles.center}>
           Check your email

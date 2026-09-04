@@ -8,10 +8,12 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ScreenContainer } from '@/components/ui/screen-container';
 import { Brand, IconSize, Spacing } from '@/constants/theme';
+import { useBrand } from '@/hooks/use-brand';
 import { usePreferredLocation } from '@/lib/preferred-location';
 
 export default function RedemptionConfirmScreen() {
   const router = useRouter();
+  const brand = useBrand();
   const { preferredLocation } = usePreferredLocation();
   const [acknowledged, setAcknowledged] = useState(false);
 
@@ -19,8 +21,8 @@ export default function RedemptionConfirmScreen() {
     return (
       <ScreenContainer>
         <Card accessibilityLabel="Choose a location first">
-          <View style={styles.iconWrap}>
-            <Ionicons name="location-outline" size={IconSize.xlarge} color={Brand.primary} />
+          <View style={[styles.iconWrap, { backgroundColor: `${brand.primary}1A` }]}>
+            <Ionicons name="location-outline" size={IconSize.xlarge} color={brand.primary} />
           </View>
           <ThemedText type="smallBold">Choose a location first</ThemedText>
           <ThemedText themeColor="textSecondary">
@@ -38,7 +40,7 @@ export default function RedemptionConfirmScreen() {
 
       <Card accessibilityLabel={`Redeeming at ${preferredLocation.name}`}>
         <View style={styles.rowHeader}>
-          <Ionicons name="storefront" size={IconSize.medium} color={Brand.primary} />
+          <Ionicons name="storefront" size={IconSize.medium} color={brand.primary} />
           <ThemedText type="smallBold">Redeeming at</ThemedText>
         </View>
         <ThemedText themeColor="textSecondary">
@@ -48,7 +50,7 @@ export default function RedemptionConfirmScreen() {
 
       <Card accessibilityLabel="Purchase requirement">
         <View style={styles.rowHeader}>
-          <Ionicons name="restaurant" size={IconSize.medium} color={Brand.primary} />
+          <Ionicons name="restaurant" size={IconSize.medium} color={brand.primary} />
           <ThemedText type="smallBold">Purchase a qualifying entrée</ThemedText>
         </View>
         <ThemedText themeColor="textSecondary">
@@ -79,7 +81,7 @@ export default function RedemptionConfirmScreen() {
         <Ionicons
           name={acknowledged ? 'checkbox' : 'square-outline'}
           size={22}
-          color={acknowledged ? Brand.primary : Brand.charcoal}
+          color={acknowledged ? brand.primary : Brand.charcoal}
         />
         <ThemedText style={styles.checkboxLabel}>
           I acknowledge the{' '}

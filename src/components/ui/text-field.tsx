@@ -4,6 +4,7 @@ import { Pressable, StyleSheet, TextInput, View, type TextInputProps } from 'rea
 
 import { ThemedText } from '@/components/themed-text';
 import { Brand, MinTouchTarget, Radius, Spacing } from '@/constants/theme';
+import { useBrand } from '@/hooks/use-brand';
 import { useTheme } from '@/hooks/use-theme';
 
 export type TextFieldProps = TextInputProps & {
@@ -21,11 +22,12 @@ export function TextField({
   ...inputProps
 }: TextFieldProps) {
   const theme = useTheme();
+  const brand = useBrand();
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const isPasswordField = !!secureTextEntry;
 
-  const borderColor = error ? Brand.danger : isFocused ? Brand.primary : theme.border;
+  const borderColor = error ? Brand.danger : isFocused ? brand.primary : theme.border;
 
   return (
     <View style={styles.container}>

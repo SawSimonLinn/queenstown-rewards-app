@@ -2,7 +2,8 @@ import { RefreshControl, ScrollView, StyleSheet, type ViewProps } from 'react-na
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ThemedView } from '@/components/themed-view';
-import { Brand, MaxContentWidth, Spacing } from '@/constants/theme';
+import { MaxContentWidth, Spacing } from '@/constants/theme';
+import { useBrand } from '@/hooks/use-brand';
 import { useTabBarBottomPadding } from '@/hooks/use-tab-bar-bottom-padding';
 
 export type ScreenContainerProps = ViewProps & {
@@ -24,6 +25,7 @@ export function ScreenContainer({
   ...rest
 }: ScreenContainerProps) {
   const tabBarBottomPadding = useTabBarBottomPadding();
+  const brand = useBrand();
 
   const content = (
     <ThemedView
@@ -52,8 +54,8 @@ export function ScreenContainer({
                 <RefreshControl
                   refreshing={refreshing}
                   onRefresh={onRefresh}
-                  tintColor={Brand.primary}
-                  colors={[Brand.primary]}
+                  tintColor={brand.primary}
+                  colors={[brand.primary]}
                 />
               ) : undefined
             }

@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ScreenContainer } from '@/components/ui/screen-container';
 import { Brand, Spacing } from '@/constants/theme';
+import { useBrand } from '@/hooks/use-brand';
 
 const STEPS: { title: string; detail: string }[] = [
   { title: 'Join the Club', detail: 'Join once — it takes a minute.' },
@@ -42,11 +43,12 @@ const STEPS: { title: string; detail: string }[] = [
 
 export default function HowItWorksScreen() {
   const router = useRouter();
+  const brand = useBrand();
 
   return (
     <ScreenContainer scroll>
-      <View style={styles.iconWrap}>
-        <Ionicons name="ribbon" size={32} color={Brand.primary} />
+      <View style={[styles.iconWrap, { backgroundColor: `${brand.primary}1A` }]}>
+        <Ionicons name="ribbon" size={32} color={brand.primary} />
       </View>
       <ThemedText type="title" style={styles.center}>
         How the Burger Club works
@@ -59,7 +61,7 @@ export default function HowItWorksScreen() {
         {STEPS.map((step, index) => (
           <Card key={step.title} accessibilityLabel={`Step ${index + 1}: ${step.title}`}>
             <View style={styles.stepRow}>
-              <View style={styles.stepNumber}>
+              <View style={[styles.stepNumber, { backgroundColor: brand.primary }]}>
                 <ThemedText type="smallBold" style={styles.stepNumberText}>
                   {index + 1}
                 </ThemedText>

@@ -20,6 +20,7 @@ import { ErrorState } from '@/components/ui/error-state';
 import { FadeInView, MotionDuration } from '@/components/ui/motion';
 import { ScreenContainer } from '@/components/ui/screen-container';
 import { Brand, IconSize, Spacing } from '@/constants/theme';
+import { useBrand } from '@/hooks/use-brand';
 import { useTheme } from '@/hooks/use-theme';
 import { useQrValidation } from '@/hooks/use-qr-validation';
 import { cancelPendingRedemption, getRedemptionStatus } from '@/services/redemption';
@@ -67,6 +68,7 @@ export default function ReviewScreen() {
   const { token, locationId } = useLocalSearchParams<{ token: string; locationId: string }>();
   const { state, retry } = useQrValidation(token, locationId);
   const router = useRouter();
+  const brand = useBrand();
   const [isCancelling, setIsCancelling] = useState(false);
   const [cancelError, setCancelError] = useState<string | null>(null);
   const [confirmedAt, setConfirmedAt] = useState<Date | null>(null);
@@ -115,7 +117,7 @@ export default function ReviewScreen() {
         <FadeInView>
           <Card accessibilityLabel="Checking QR code">
             <View style={styles.waitingRow}>
-              <ActivityIndicator size="small" color={Brand.primary} />
+              <ActivityIndicator size="small" color={brand.primary} />
               <ThemedText themeColor="textSecondary">Checking QR code…</ThemedText>
             </View>
           </Card>
@@ -195,6 +197,7 @@ export default function ReviewScreen() {
 }
 
 function PulsingDot() {
+  const brand = useBrand();
   const reduceMotion = useReducedMotion();
   const progress = useSharedValue(1);
 
@@ -222,7 +225,9 @@ function PulsingDot() {
     transform: [{ scale: progress.value }],
   }));
 
-  return <Animated.View style={[styles.dot, animatedStyle]} />;
+  return (
+    <Animated.View style={[styles.dot, { backgroundColor: brand.secondary }, animatedStyle]} />
+  );
 }
 
 function RedemptionSuccess({
@@ -238,13 +243,14 @@ function RedemptionSuccess({
   confirmedAt: Date;
   onDone: () => void;
 }) {
+  const brand = useBrand();
   const reference = redemptionId.slice(0, 8).toUpperCase();
 
   return (
     <>
-      <View style={styles.stampRing}>
-        <View style={styles.stampCore}>
-          <Ionicons name="checkmark" size={34} color={Brand.onPrimary} />
+      <View style={[styles.stampRing, { borderColor: brand.primary }]}>
+        <View style={[styles.stampCore, { backgroundColor: brand.primary }]}>
+          <Ionicons name="checkmark" size={34} color={brand.onPrimary} />
         </View>
       </View>
       <ThemedText type="editorial" style={styles.center}>

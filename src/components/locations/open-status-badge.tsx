@@ -1,7 +1,8 @@
 import { StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
-import { StatusBadge, TONE_COLOR, type StatusTone } from '@/components/ui/status-badge';
+import { StatusBadge, getToneColor, type StatusTone } from '@/components/ui/status-badge';
+import { useBrand } from '@/hooks/use-brand';
 import { STATUS_COPY, type LocationStatus } from '@/lib/schedule';
 
 const TONE: Record<LocationStatus, StatusTone> = {
@@ -24,7 +25,8 @@ export function OpenStatusBadge({ status }: { status: LocationStatus }) {
 
 /** Minimal colour-dot + label variant for tight spaces (e.g. small carousel cards) where the full pill badge is too heavy. */
 export function OpenStatusDot({ status }: { status: LocationStatus }) {
-  const color = TONE_COLOR[TONE[status]];
+  const brand = useBrand();
+  const color = getToneColor(brand)[TONE[status]];
   return (
     <View style={styles.row} accessibilityLabel={STATUS_COPY[status]}>
       <View style={[styles.dot, { backgroundColor: color }]} />

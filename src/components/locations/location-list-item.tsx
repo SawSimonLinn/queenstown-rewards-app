@@ -7,6 +7,7 @@ import { FadingImage } from '@/components/ui/fading-image';
 import { Brand, IconSize, Radius, Spacing } from '@/constants/theme';
 import { getLocationImages } from '@/data/location-images';
 import type { RestaurantLocation } from '@/data/types';
+import { useBrand } from '@/hooks/use-brand';
 import { useTheme } from '@/hooks/use-theme';
 import { usePreferredLocation } from '@/lib/preferred-location';
 import { getLocationStatus, getTodayHoursLabel } from '@/lib/schedule';
@@ -25,6 +26,7 @@ export function LocationListItem({
   onPress,
 }: LocationListItemProps) {
   const theme = useTheme();
+  const brand = useBrand();
   const status = getLocationStatus(location);
   const todayHours = getTodayHoursLabel(location);
   const thumbnail = getLocationImages(location.id).logo ?? getLocationImages(location.id).hero;
@@ -42,8 +44,12 @@ export function LocationListItem({
       onPress={onPress}
       style={({ pressed }) => [
         styles.row,
-        isPreferred && styles.rowPreferred,
-        isSelected && styles.rowSelected,
+        isPreferred && {
+          borderLeftWidth: 3,
+          borderLeftColor: brand.primary,
+          paddingLeft: Spacing.three - 3,
+        },
+        isSelected && { backgroundColor: `${brand.primary}0D` },
         pressed && styles.pressed,
       ]}
     >
@@ -58,8 +64,8 @@ export function LocationListItem({
           accessibilityIgnoresInvertColors
         />
       ) : (
-        <View style={styles.thumbnailFallback}>
-          <ThemedText type="smallBold" style={styles.thumbnailInitial}>
+        <View style={[styles.thumbnailFallback, { backgroundColor: brand.primaryTint }]}>
+          <ThemedText type="smallBold" style={[styles.thumbnailInitial, { color: brand.primaryDark }]}>
             {location.shortName.charAt(0)}
           </ThemedText>
         </View>
@@ -74,7 +80,7 @@ export function LocationListItem({
             <Ionicons
               name="star"
               size={13}
-              color={Brand.primary}
+              color={brand.primary}
               accessibilityLabel="Your preferred location"
             />
           )}
@@ -107,14 +113,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: `${Brand.charcoal}12`,
   },
-  rowPreferred: {
-    borderLeftWidth: 3,
-    borderLeftColor: Brand.primary,
-    paddingLeft: Spacing.three - 3,
-  },
-  rowSelected: {
-    backgroundColor: `${Brand.primary}0D`,
-  },
   pressed: {
     opacity: 0.7,
   },
@@ -122,12 +120,10 @@ const styles = StyleSheet.create({
     width: 72,
     height: 72,
     borderRadius: Radius.medium,
-    backgroundColor: Brand.primaryTint,
     alignItems: 'center',
     justifyContent: 'center',
   },
   thumbnailInitial: {
-    color: Brand.primaryDark,
     fontSize: 18,
   },
   textGroup: {

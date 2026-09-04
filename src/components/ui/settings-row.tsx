@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { Brand, IconSize, Radius, Spacing } from '@/constants/theme';
+import { useBrand } from '@/hooks/use-brand';
 
 export type SettingsRowProps = {
   icon: keyof typeof Ionicons.glyphMap;
@@ -13,6 +14,8 @@ export type SettingsRowProps = {
 
 /** A single tappable row inside a `Card noPadding` group — Profile and Account Settings share this. */
 export function SettingsRow({ icon, label, value, onPress }: SettingsRowProps) {
+  const brand = useBrand();
+
   return (
     <Pressable
       accessibilityRole="button"
@@ -20,8 +23,8 @@ export function SettingsRow({ icon, label, value, onPress }: SettingsRowProps) {
       onPress={onPress}
       style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
     >
-      <View style={styles.iconWrap}>
-        <Ionicons name={icon} size={IconSize.medium} color={Brand.primary} />
+      <View style={[styles.iconWrap, { backgroundColor: `${brand.primary}14` }]}>
+        <Ionicons name={icon} size={IconSize.medium} color={brand.primary} />
       </View>
       <View style={styles.textGroup}>
         <ThemedText style={styles.label}>{label}</ThemedText>
@@ -31,7 +34,7 @@ export function SettingsRow({ icon, label, value, onPress }: SettingsRowProps) {
           </ThemedText>
         )}
       </View>
-      <Ionicons name="chevron-forward" size={18} color={Brand.primary} />
+      <Ionicons name="chevron-forward" size={18} color={brand.primary} />
     </Pressable>
   );
 }
@@ -56,7 +59,6 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: Radius.small,
-    backgroundColor: `${Brand.primary}14`,
     alignItems: 'center',
     justifyContent: 'center',
   },

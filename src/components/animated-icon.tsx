@@ -1,14 +1,30 @@
 import * as SplashScreen from 'expo-splash-screen';
-import { useState } from 'react';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Animated, { Easing, Keyframe, useReducedMotion } from 'react-native-reanimated';
+import Animated, {
+  Easing,
+  Keyframe,
+  useAnimatedStyle,
+  useReducedMotion,
+  useSharedValue,
+  withRepeat,
+  withSequence,
+  withTiming,
+} from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
 
 import { ThemedText } from '@/components/themed-text';
 import { Brand, Radius, Spacing } from '@/constants/theme';
 
 const DURATION = 600;
+
+/**
+ * The splash stays up for at least this long even if startup data (session,
+ * profile, preferred location, membership) resolves instantly, so the brand
+ * moment always gets to play out rather than flashing by.
+ */
+const MIN_VISIBLE_MS = 3000;
 
 export type AnimatedSplashOverlayProps = {
   /**
@@ -26,11 +42,34 @@ export function AnimatedSplashOverlay({ ready }: AnimatedSplashOverlayProps) {
   const reduceMotion = useReducedMotion();
   const [hasHiddenNativeSplash, setHasHiddenNativeSplash] = useState(false);
   const [visible, setVisible] = useState(true);
+  const [minTimeElapsed, setMinTimeElapsed] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setMinTimeElapsed(true), MIN_VISIBLE_MS);
+    return () => clearTimeout(timer);
+  }, []);
+
   // Once the native splash is hidden behind this (visually identical)
   // overlay, the transition-out animation only starts once startup data is
-  // actually ready — derived directly from props/state rather than mirrored
-  // into its own state to avoid a redundant extra render.
-  const animate = ready && hasHiddenNativeSplash;
+  // actually ready and the minimum brand-moment duration has played out —
+  // derived directly from props/state rather than mirrored into its own
+  // state to avoid a redundant extra render.
+  const animate = ready && hasHiddenNativeSplash && minTimeElapsed;
+
+  const pulse = useSharedValue(1);
+  useEffect(() => {
+    if (reduceMotion) return;
+    pulse.value = withRepeat(
+      withSequence(
+        withTiming(1.08, { duration: 700, easing: Easing.inOut(Easing.quad) }),
+        withTiming(1, { duration: 700, easing: Easing.inOut(Easing.quad) }),
+      ),
+      -1,
+    );
+  }, [pulse, reduceMotion]);
+  const pulseStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: pulse.value }],
+  }));
 
   if (!visible) return null;
 
@@ -53,15 +92,11 @@ export function AnimatedSplashOverlay({ ready }: AnimatedSplashOverlayProps) {
 
   const content = (
     <SafeAreaView style={styles.content}>
-      <View style={styles.brandMark}>
+      <Animated.View style={[styles.brandMark, pulseStyle]}>
         <ThemedText type="display" style={styles.brandMarkText}>
           Q
         </ThemedText>
-      </View>
-      <ActivityIndicator size="small" color={Brand.primary} style={styles.spinner} />
-      <ThemedText type="small" themeColor="textSecondary">
-        Preparing your rewards
-      </ThemedText>
+      </Animated.View>
     </SafeAreaView>
   );
 
@@ -108,9 +143,6 @@ const styles = StyleSheet.create({
   },
   brandMarkText: {
     color: Brand.onPrimary,
-  },
-  spinner: {
-    marginTop: Spacing.three,
   },
   splashOverlay: {
     ...StyleSheet.absoluteFill,

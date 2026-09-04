@@ -5,6 +5,7 @@ import { StyleSheet, View } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { Brand, Radius } from '@/constants/theme';
 import type { RestaurantLocation } from '@/data/types';
+import { useBrand } from '@/hooks/use-brand';
 
 export type LocationMapMarkerProps = {
   location: RestaurantLocation;
@@ -30,6 +31,8 @@ export const LocationMapMarker = memo(function LocationMapMarker({
   isSelected,
   onPress,
 }: LocationMapMarkerProps) {
+  const brand = useBrand();
+
   if (!location.coordinates) return null;
 
   return (
@@ -52,10 +55,23 @@ export const LocationMapMarker = memo(function LocationMapMarker({
             </ThemedText>
           </View>
         )}
-        <View style={[styles.pin, isSelected && styles.pinSelected]}>
+        <View
+          style={[
+            styles.pin,
+            { backgroundColor: brand.primary },
+            isSelected && styles.pinSelected,
+            isSelected && { backgroundColor: brand.primaryDark },
+          ]}
+        >
           <View style={styles.pinDot} />
         </View>
-        <View style={[styles.tail, isSelected && styles.tailSelected]} />
+        <View
+          style={[
+            styles.tail,
+            { backgroundColor: brand.primary },
+            isSelected && { backgroundColor: brand.primaryDark },
+          ]}
+        />
       </View>
     </Marker>
   );
@@ -89,7 +105,6 @@ const styles = StyleSheet.create({
     width: PIN_SIZE,
     height: PIN_SIZE,
     borderRadius: PIN_SIZE / 2,
-    backgroundColor: Brand.primary,
     borderWidth: 2,
     borderColor: Brand.onPrimary,
     alignItems: 'center',
@@ -99,7 +114,6 @@ const styles = StyleSheet.create({
     width: PIN_SIZE_SELECTED,
     height: PIN_SIZE_SELECTED,
     borderRadius: PIN_SIZE_SELECTED / 2,
-    backgroundColor: Brand.primaryDark,
     borderWidth: 3,
   },
   pinDot: {
@@ -112,10 +126,6 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     marginTop: -5,
-    backgroundColor: Brand.primary,
     transform: [{ rotate: '45deg' }],
-  },
-  tailSelected: {
-    backgroundColor: Brand.primaryDark,
   },
 });

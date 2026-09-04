@@ -13,6 +13,7 @@ import { ScreenContainer } from '@/components/ui/screen-container';
 import { CardSkeleton } from '@/components/ui/skeleton';
 import { TextField } from '@/components/ui/text-field';
 import { Brand, IconSize, Spacing } from '@/constants/theme';
+import { useBrand } from '@/hooks/use-brand';
 import { QUEENSTOWN_LOCATIONS } from '@/data/locations';
 import { specialSchema, type SpecialFormValues } from '@/lib/validation/special';
 import { getSupabaseLocationId, getSlugForSupabaseLocationId } from '@/services/locations';
@@ -30,6 +31,7 @@ function toDateOnly(iso: string): string {
 export default function SpecialFormScreen() {
   const { id } = useLocalSearchParams<{ id?: string }>();
   const router = useRouter();
+  const brand = useBrand();
   const isEditing = !!id;
   const [isLoadingExisting, setIsLoadingExisting] = useState(isEditing);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -237,7 +239,7 @@ export default function SpecialFormScreen() {
                 <Ionicons
                   name={selected ? 'checkbox' : 'square-outline'}
                   size={22}
-                  color={selected ? Brand.primary : Brand.charcoal}
+                  color={selected ? brand.primary : Brand.charcoal}
                 />
                 <ThemedText style={styles.locationLabel}>{location.name}</ThemedText>
               </Pressable>

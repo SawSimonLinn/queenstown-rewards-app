@@ -9,6 +9,7 @@ import { ScreenContainer } from '@/components/ui/screen-container';
 import { SectionHeader } from '@/components/ui/section-header';
 import { APP_NAME } from '@/constants/app';
 import { Brand, IconSize, Spacing } from '@/constants/theme';
+import { useBrand } from '@/hooks/use-brand';
 import { useTheme } from '@/hooks/use-theme';
 
 type FaqItem = { id: string; question: string; answer: string };
@@ -103,11 +104,12 @@ const SUPPORT_EMAIL = 'support@queenstownrewards.co.nz';
 export default function HelpScreen() {
   const [openId, setOpenId] = useState<string | null>(null);
   const theme = useTheme();
+  const brand = useBrand();
 
   return (
     <ScreenContainer scroll>
-      <View style={styles.iconWrap}>
-        <Ionicons name="help-circle" size={28} color={Brand.primary} />
+      <View style={[styles.iconWrap, { backgroundColor: `${brand.primary}1A` }]}>
+        <Ionicons name="help-circle" size={28} color={brand.primary} />
       </View>
       <ThemedText type="title" style={styles.center}>
         Help & FAQ
@@ -140,7 +142,7 @@ export default function HelpScreen() {
                     <Ionicons
                       name={isOpen ? 'chevron-up' : 'chevron-down'}
                       size={IconSize.small}
-                      color={Brand.primary}
+                      color={brand.primary}
                     />
                   </Pressable>
                   {isOpen && (
@@ -157,7 +159,7 @@ export default function HelpScreen() {
 
       <Card accessibilityLabel="Contact support">
         <View style={styles.contactRow}>
-          <Ionicons name="mail-outline" size={18} color={Brand.primary} />
+          <Ionicons name="mail-outline" size={18} color={brand.primary} />
           <ThemedText type="smallBold">Still need help?</ThemedText>
         </View>
         <ThemedText themeColor="textSecondary">

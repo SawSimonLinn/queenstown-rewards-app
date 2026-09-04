@@ -3,7 +3,8 @@ import { StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { IconButton } from '@/components/ui/icon-button';
-import { Brand, Radius, Spacing } from '@/constants/theme';
+import { Radius, Spacing } from '@/constants/theme';
+import { useBrand } from '@/hooks/use-brand';
 import { useTheme } from '@/hooks/use-theme';
 
 export type AppHeaderProps = {
@@ -28,6 +29,7 @@ export function AppHeader({
   rightBadgeCount,
 }: AppHeaderProps) {
   const theme = useTheme();
+  const brand = useBrand();
 
   return (
     <View style={styles.row}>
@@ -41,8 +43,11 @@ export function AppHeader({
           />
         )}
         {!onBackPress && (
-          <View style={styles.brandMark} accessibilityElementsHidden>
-            <ThemedText type="editorial" style={styles.brandMarkText}>
+          <View
+            style={[styles.brandMark, { backgroundColor: brand.primary }]}
+            accessibilityElementsHidden
+          >
+            <ThemedText type="editorial" style={[styles.brandMarkText, { color: brand.onPrimary }]}>
               Q
             </ThemedText>
           </View>
@@ -68,10 +73,16 @@ export function AppHeader({
           />
           {!!rightBadgeCount && rightBadgeCount > 0 && (
             <View
-              style={[styles.badgeCount, { borderColor: theme.background }]}
+              style={[
+                styles.badgeCount,
+                { backgroundColor: brand.primary, borderColor: theme.background },
+              ]}
               accessibilityElementsHidden
             >
-              <ThemedText type="small" style={styles.badgeCountText}>
+              <ThemedText
+                type="small"
+                style={[styles.badgeCountText, { color: brand.onPrimary }]}
+              >
                 {rightBadgeCount > 9 ? '9+' : rightBadgeCount}
               </ThemedText>
             </View>
@@ -100,12 +111,10 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: Radius.small,
-    backgroundColor: Brand.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
   brandMarkText: {
-    color: Brand.onPrimary,
     fontSize: 22,
     lineHeight: 26,
   },
@@ -121,13 +130,11 @@ const styles = StyleSheet.create({
     height: 18,
     borderRadius: 9,
     paddingHorizontal: 4,
-    backgroundColor: Brand.primary,
     borderWidth: 2,
     alignItems: 'center',
     justifyContent: 'center',
   },
   badgeCountText: {
-    color: Brand.onPrimary,
     fontSize: 10,
     lineHeight: 12,
   },

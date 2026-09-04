@@ -14,7 +14,8 @@ import { ScreenContainer } from '@/components/ui/screen-container';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 import { CardSkeleton } from '@/components/ui/skeleton';
 import { StatusBadge, type StatusTone } from '@/components/ui/status-badge';
-import { Brand, Spacing } from '@/constants/theme';
+import { Spacing } from '@/constants/theme';
+import { useBrand } from '@/hooks/use-brand';
 import { useTheme } from '@/hooks/use-theme';
 import { formatDateRange } from '@/lib/format';
 import { useProfileContext } from '@/lib/profile';
@@ -228,6 +229,7 @@ function ManageRow({
   onDelete: () => void;
 }): ReactNode {
   const theme = useTheme();
+  const brand = useBrand();
   return (
     <Card accessibilityLabel={title}>
       <View style={styles.row}>
@@ -246,8 +248,8 @@ function ManageRow({
           accessibilityLabel="Edit"
           style={({ pressed }) => [styles.actionButton, pressed && styles.actionButtonPressed]}
         >
-          <Ionicons name="create-outline" size={18} color={Brand.primary} />
-          <ThemedText type="smallBold" style={{ color: Brand.primary }}>
+          <Ionicons name="create-outline" size={18} color={brand.primary} />
+          <ThemedText type="smallBold" style={{ color: brand.primary }}>
             Edit
           </ThemedText>
         </Pressable>

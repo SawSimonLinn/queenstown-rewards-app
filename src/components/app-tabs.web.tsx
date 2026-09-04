@@ -12,7 +12,8 @@ import { Pressable, View, StyleSheet } from 'react-native';
 import { ThemedText } from './themed-text';
 
 import { APP_NAME } from '@/constants/app';
-import { Brand, Colors, MaxContentWidth, Radius, Shadows, Spacing } from '@/constants/theme';
+import { Colors, MaxContentWidth, Radius, Shadows, Spacing } from '@/constants/theme';
+import { useBrand } from '@/hooks/use-brand';
 
 const TAB_ICONS = {
   home: 'home' as const,
@@ -48,13 +49,20 @@ export default function AppTabs() {
 type TabButtonProps = TabTriggerSlotProps & { icon: keyof typeof Ionicons.glyphMap };
 
 export function TabButton({ children, isFocused, icon, ...props }: TabButtonProps) {
+  const brand = useBrand();
   return (
     <Pressable {...props} style={({ pressed }) => pressed && styles.pressed}>
-      <View
-        style={[styles.tabButtonView, isFocused && { backgroundColor: Brand.primaryTint }]}
-      >
-        <Ionicons name={icon} size={16} color={isFocused ? Brand.primary : Colors.light.textSecondary} />
-        <ThemedText type="small" style={isFocused ? styles.activeLabel : undefined} themeColor="textSecondary">
+      <View style={[styles.tabButtonView, isFocused && { backgroundColor: brand.primaryTint }]}>
+        <Ionicons
+          name={icon}
+          size={16}
+          color={isFocused ? brand.primary : Colors.light.textSecondary}
+        />
+        <ThemedText
+          type="small"
+          style={isFocused ? [styles.activeLabel, { color: brand.primary }] : undefined}
+          themeColor="textSecondary"
+        >
           {children}
         </ThemedText>
       </View>
@@ -106,7 +114,6 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   activeLabel: {
-    color: Brand.primary,
     fontWeight: '700',
   },
   tabButtonView: {

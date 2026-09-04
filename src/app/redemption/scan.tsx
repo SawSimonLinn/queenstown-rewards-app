@@ -9,11 +9,13 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ScreenContainer } from '@/components/ui/screen-container';
 import { Brand, IconSize, Radius, Spacing } from '@/constants/theme';
+import { useBrand } from '@/hooks/use-brand';
 import { usePreferredLocation } from '@/lib/preferred-location';
 import { getSupabaseLocationId } from '@/services/locations';
 
 export default function ScanScreen() {
   const router = useRouter();
+  const brand = useBrand();
   const { preferredLocation } = usePreferredLocation();
   const [permission, requestPermission] = useCameraPermissions();
   // Prevents a single QR code from firing onBarcodeScanned repeatedly while
@@ -24,8 +26,8 @@ export default function ScanScreen() {
     return (
       <ScreenContainer>
         <Card accessibilityLabel="Choose a location first">
-          <View style={styles.introIconWrap}>
-            <Ionicons name="location-outline" size={IconSize.xlarge} color={Brand.primary} />
+          <View style={[styles.introIconWrap, { backgroundColor: `${brand.primary}1A` }]}>
+            <Ionicons name="location-outline" size={IconSize.xlarge} color={brand.primary} />
           </View>
           <ThemedText type="smallBold">Choose a location first</ThemedText>
           <ThemedText themeColor="textSecondary">
@@ -45,8 +47,8 @@ export default function ScanScreen() {
     return (
       <ScreenContainer>
         <Card accessibilityLabel="Camera access needed">
-          <View style={styles.introIconWrap}>
-            <Ionicons name="camera-outline" size={IconSize.xlarge} color={Brand.primary} />
+          <View style={[styles.introIconWrap, { backgroundColor: `${brand.primary}1A` }]}>
+            <Ionicons name="camera-outline" size={IconSize.xlarge} color={brand.primary} />
           </View>
           <ThemedText type="smallBold">Camera access needed</ThemedText>
           <ThemedText themeColor="textSecondary">
@@ -103,7 +105,10 @@ export default function ScanScreen() {
             accessibilityLabel="Point your camera at the redemption QR code"
           />
           {(['topLeft', 'topRight', 'bottomLeft', 'bottomRight'] as const).map((corner) => (
-            <View key={corner} style={[styles.corner, cornerStyles[corner]]} />
+            <View
+              key={corner}
+              style={[styles.corner, cornerStyles[corner], { borderColor: brand.primary }]}
+            />
           ))}
         </View>
         <ThemedText style={styles.instructions}>

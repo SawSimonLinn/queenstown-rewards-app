@@ -8,6 +8,7 @@ import { ScreenContainer } from '@/components/ui/screen-container';
 import { SectionHeader } from '@/components/ui/section-header';
 import { APP_NAME } from '@/constants/app';
 import { Brand, Spacing } from '@/constants/theme';
+import { useBrand } from '@/hooks/use-brand';
 
 const LAST_UPDATED = 'September 2026';
 
@@ -55,11 +56,12 @@ const SECTIONS: Section[] = [
 
 export default function TermsAndConditionsScreen() {
   const router = useRouter();
+  const brand = useBrand();
 
   return (
     <ScreenContainer scroll>
-      <View style={styles.iconWrap}>
-        <Ionicons name="document-text" size={28} color={Brand.primary} />
+      <View style={[styles.iconWrap, { backgroundColor: `${brand.primary}1A` }]}>
+        <Ionicons name="document-text" size={28} color={brand.primary} />
       </View>
       <ThemedText type="title" style={styles.center}>
         Terms and conditions
@@ -84,7 +86,7 @@ export default function TermsAndConditionsScreen() {
           <View style={styles.list}>
             {section.items.map((term) => (
               <View key={term} style={styles.termRow}>
-                <View style={styles.bullet} />
+                <View style={[styles.bullet, { backgroundColor: brand.primary }]} />
                 <ThemedText themeColor="textSecondary" style={styles.termText}>
                   {term}
                 </ThemedText>

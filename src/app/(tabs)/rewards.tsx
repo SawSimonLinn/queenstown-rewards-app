@@ -19,6 +19,7 @@ import { CardSkeleton, HeroCardSkeleton, MembershipSkeleton } from '@/components
 import { StatusBadge } from '@/components/ui/status-badge';
 import { Brand, IconSize, Spacing } from '@/constants/theme';
 import { QUEENSTOWN_LOCATIONS } from '@/data/locations';
+import { useBrand } from '@/hooks/use-brand';
 import { useHomeScreenData } from '@/hooks/use-home-screen-data';
 import { useMembership } from '@/hooks/use-membership';
 import { useRedemptionHistory } from '@/hooks/use-redemption-history';
@@ -34,6 +35,7 @@ const PARTICIPATING_LOCATION_COUNT = QUEENSTOWN_LOCATIONS.filter(
 ).length;
 
 export default function RewardsScreen() {
+  const brand = useBrand();
   const {
     state,
     retry,
@@ -160,7 +162,7 @@ export default function RewardsScreen() {
             <Ionicons
               name="information-circle-outline"
               size={IconSize.medium}
-              color={Brand.primary}
+              color={brand.primary}
             />
             <ThemedText type="small" themeColor="textSecondary" style={styles.guideBody}>
               Buy another qualifying entrée, scan at the restaurant and ask your server to confirm.{' '}
@@ -213,6 +215,7 @@ export default function RewardsScreen() {
 }
 
 function HistoryRow({ item, isLast }: { item: RedemptionHistoryItem; isLast: boolean }) {
+  const brand = useBrand();
   const copy = REDEMPTION_STATUS_COPY[item.status];
   return (
     <View
@@ -220,7 +223,7 @@ function HistoryRow({ item, isLast }: { item: RedemptionHistoryItem; isLast: boo
       accessibilityLabel={`${item.campaignName} at ${item.locationName}, ${copy.label}`}
     >
       <View style={styles.timelineRail}>
-        <View style={styles.timelineDot} />
+        <View style={[styles.timelineDot, { backgroundColor: brand.primary }]} />
         {!isLast && <View style={styles.timelineLine} />}
       </View>
       <View style={styles.historyContent}>
@@ -276,7 +279,6 @@ const styles = StyleSheet.create({
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: Brand.primary,
     marginTop: 7,
   },
   timelineLine: {

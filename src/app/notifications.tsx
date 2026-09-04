@@ -8,12 +8,14 @@ import { InlineFeedback } from '@/components/ui/inline-feedback';
 import { FadeInView } from '@/components/ui/motion';
 import { ScreenContainer } from '@/components/ui/screen-container';
 import { NotificationSkeleton } from '@/components/ui/skeleton';
-import { Brand, Spacing } from '@/constants/theme';
+import { Spacing } from '@/constants/theme';
+import { useBrand } from '@/hooks/use-brand';
 import { useNotifications } from '@/hooks/use-notifications';
 import { useNotificationInbox } from '@/lib/notification-inbox';
 import type { AppNotification } from '@/types';
 
 export default function NotificationsScreen() {
+  const brand = useBrand();
   const {
     state,
     retry,
@@ -57,7 +59,7 @@ export default function NotificationsScreen() {
             accessibilityState={{ busy: isMarkingAllRead, disabled: isMarkingAllRead }}
             style={styles.markAllButton}
           >
-            {isMarkingAllRead && <ActivityIndicator size="small" color={Brand.primary} />}
+            {isMarkingAllRead && <ActivityIndicator size="small" color={brand.primary} />}
             <ThemedText type="linkPrimary">
               {isMarkingAllRead ? 'Marking read' : 'Mark all as read'}
             </ThemedText>

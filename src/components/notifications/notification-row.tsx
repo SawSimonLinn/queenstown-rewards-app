@@ -4,6 +4,7 @@ import { ThemedText } from '@/components/themed-text';
 import { Card } from '@/components/ui/card';
 import { FadeInView } from '@/components/ui/motion';
 import { Brand, Radius, Spacing } from '@/constants/theme';
+import { useBrand } from '@/hooks/use-brand';
 import { formatRelativeTime } from '@/lib/format';
 import type { AppNotification, NotificationType } from '@/types';
 
@@ -21,6 +22,7 @@ export type NotificationRowProps = {
 };
 
 export function NotificationRow({ item, isProcessing = false, onPress }: NotificationRowProps) {
+  const brand = useBrand();
   const isUnread = !item.readAt;
 
   return (
@@ -34,11 +36,17 @@ export function NotificationRow({ item, isProcessing = false, onPress }: Notific
       >
         <Card
           noPadding
-          style={[styles.card, isUnread && styles.cardUnread]}
+          style={[
+            styles.card,
+            isUnread && [
+              styles.cardUnread,
+              { backgroundColor: brand.primaryTint, borderColor: `${brand.primary}33` },
+            ],
+          ]}
           accessibilityLabel={item.title}
         >
           <View style={styles.row}>
-            <View style={[styles.dot, isUnread && styles.dotUnread]} />
+            <View style={[styles.dot, isUnread && { backgroundColor: brand.primary }]} />
             <View style={styles.content}>
               <View style={styles.headerRow}>
                 <ThemedText
@@ -50,7 +58,7 @@ export function NotificationRow({ item, isProcessing = false, onPress }: Notific
                   {item.title}
                 </ThemedText>
                 {isProcessing ? (
-                  <ActivityIndicator size="small" color={Brand.primary} />
+                  <ActivityIndicator size="small" color={brand.primary} />
                 ) : (
                   <ThemedText type="eyebrow" themeColor="textSecondary">
                     {formatRelativeTime(item.createdAt)}
