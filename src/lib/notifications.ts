@@ -38,6 +38,10 @@ export type PushRegistrationResult =
  * this will work once the app runs in a development or production build.
  */
 export async function registerForPushNotificationsAsync(): Promise<PushRegistrationResult> {
+  if (Platform.OS === 'web') {
+    return { status: 'unsupported-device' };
+  }
+
   if (!Device.isDevice) {
     return { status: 'unsupported-device' };
   }

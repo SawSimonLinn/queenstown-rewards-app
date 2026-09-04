@@ -3,7 +3,7 @@ import Constants from 'expo-constants';
 import * as Notifications from 'expo-notifications';
 import { useRouter } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, StyleSheet, Switch, View } from 'react-native';
+import { ActivityIndicator, Platform, StyleSheet, Switch, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { AppHeader } from '@/components/ui/app-header';
@@ -25,6 +25,8 @@ import { signOut } from '@/services/auth';
 import { registerPushToken, unregisterPushToken } from '@/services/push-tokens';
 
 type PushToggleState = 'checking' | 'enabled' | 'disabled';
+
+const IS_WEB = Platform.OS === 'web';
 
 export default function ProfileScreen() {
   const { session } = useAuth();
@@ -50,6 +52,11 @@ export default function ProfileScreen() {
   const [pushError, setPushError] = useState<string | null>(null);
 
   const checkPushStatus = useCallback(async () => {
+    if (IS_WEB) {
+      setPushState('disabled');
+      return;
+    }
+
     const { status } = await Notifications.getPermissionsAsync();
     setPushState(status === 'granted' ? 'enabled' : 'disabled');
   }, []);
@@ -74,6 +81,11 @@ export default function ProfileScreen() {
 
   const handleTogglePush = async () => {
     setPushError(null);
+    if (IS_WEB) {
+      setPushError('Push notifications are only available in the mobile app.');
+      return;
+    }
+
     setIsTogglingPush(true);
     try {
       const result = await registerForPushNotificationsAsync();
