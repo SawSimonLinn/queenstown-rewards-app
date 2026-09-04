@@ -80,7 +80,7 @@ export function ClubRewardCard({
                 Burger Club Pass
               </ThemedText>
             </View>
-            {isRedeemed ? null : <RewardStateBadge status={status} />}
+            {isRedeemed ? null : <RewardStateBadge status={status} solid />}
           </View>
 
           <View style={styles.heroTextBlock}>

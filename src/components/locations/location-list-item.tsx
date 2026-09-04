@@ -1,15 +1,14 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import { OpenStatusBadge } from '@/components/locations/open-status-badge';
-import { PreferredLocationStar } from '@/components/locations/preferred-location-star';
+import { OpenStatusDot } from '@/components/locations/open-status-badge';
 import { ThemedText } from '@/components/themed-text';
 import { FadingImage } from '@/components/ui/fading-image';
 import { Brand, IconSize, Radius, Spacing } from '@/constants/theme';
 import { getLocationImages } from '@/data/location-images';
 import type { RestaurantLocation } from '@/data/types';
 import { useTheme } from '@/hooks/use-theme';
-import { getFullAddress } from '@/lib/maps';
+import { usePreferredLocation } from '@/lib/preferred-location';
 import { getLocationStatus, getTodayHoursLabel } from '@/lib/schedule';
 
 export type LocationListItemProps = {
@@ -29,14 +28,21 @@ export function LocationListItem({
   const status = getLocationStatus(location);
   const todayHours = getTodayHoursLabel(location);
   const thumbnail = getLocationImages(location.id).logo ?? getLocationImages(location.id).hero;
+  const { preferredLocation } = usePreferredLocation();
+  const isPreferred = preferredLocation?.id === location.id;
 
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`${location.name}, ${location.neighbourhood}`}
+      accessibilityLabel={
+        isPreferred
+          ? `${location.name}, ${location.neighbourhood}, your preferred location`
+          : `${location.name}, ${location.neighbourhood}`
+      }
       onPress={onPress}
       style={({ pressed }) => [
         styles.row,
+        isPreferred && styles.rowPreferred,
         isSelected && styles.rowSelected,
         pressed && styles.pressed,
       ]}
@@ -44,8 +50,8 @@ export function LocationListItem({
       {thumbnail ? (
         <FadingImage
           source={thumbnail}
-          width={52}
-          height={52}
+          width={72}
+          height={72}
           radius={Radius.medium}
           fallbackIcon="storefront"
           fallbackSize="small"
@@ -60,42 +66,33 @@ export function LocationListItem({
       )}
 
       <View style={styles.textGroup}>
-        <ThemedText type="smallBold" numberOfLines={1}>
-          {location.name}
-        </ThemedText>
-        <ThemedText type="small" themeColor="textSecondary" numberOfLines={1}>
-          {location.neighbourhood}
-        </ThemedText>
-
-        <View style={styles.metaRow}>
-          <OpenStatusBadge status={status} />
-          {location.currentlyParticipating && (
-            <View style={styles.clubTag} accessibilityLabel="Burger Club participant">
-              <Ionicons name="gift" size={11} color={Brand.secondaryDark} />
-            </View>
-          )}
-        </View>
-
-        <ThemedText type="small" themeColor="textSecondary" numberOfLines={1}>
-          {todayHours}
-        </ThemedText>
-
-        <View style={styles.addressRow}>
-          <ThemedText type="small" themeColor="textMuted" numberOfLines={1} style={styles.address}>
-            {getFullAddress(location)}
+        <View style={styles.nameRow}>
+          <ThemedText type="smallBold" numberOfLines={1} style={styles.name}>
+            {location.name}
           </ThemedText>
-          {distanceLabel && (
-            <ThemedText type="small" themeColor="textMuted" style={styles.distance}>
-              {distanceLabel}
-            </ThemedText>
+          {isPreferred && (
+            <Ionicons
+              name="star"
+              size={13}
+              color={Brand.primary}
+              accessibilityLabel="Your preferred location"
+            />
           )}
+        </View>
+
+        <ThemedText type="small" themeColor="textSecondary" numberOfLines={1}>
+          {distanceLabel ? `${location.neighbourhood} · ${distanceLabel}` : location.neighbourhood}
+        </ThemedText>
+
+        <View style={styles.statusRow}>
+          <OpenStatusDot status={status} />
+          <ThemedText type="small" themeColor="textMuted" numberOfLines={1} style={styles.hours}>
+            {`· ${todayHours}`}
+          </ThemedText>
         </View>
       </View>
 
-      <View style={styles.trailing}>
-        <PreferredLocationStar location={location} size={20} />
-        <Ionicons name="chevron-forward" size={IconSize.medium} color={theme.textMuted} />
-      </View>
+      <Ionicons name="chevron-forward" size={IconSize.medium} color={theme.textMuted} />
     </Pressable>
   );
 }
@@ -110,21 +107,20 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: `${Brand.charcoal}12`,
   },
+  rowPreferred: {
+    borderLeftWidth: 3,
+    borderLeftColor: Brand.primary,
+    paddingLeft: Spacing.three - 3,
+  },
   rowSelected: {
     backgroundColor: `${Brand.primary}0D`,
   },
   pressed: {
     opacity: 0.7,
   },
-  thumbnail: {
-    width: 52,
-    height: 52,
-    borderRadius: Radius.medium,
-    backgroundColor: Brand.mutedSurface,
-  },
   thumbnailFallback: {
-    width: 52,
-    height: 52,
+    width: 72,
+    height: 72,
     borderRadius: Radius.medium,
     backgroundColor: Brand.primaryTint,
     alignItems: 'center',
@@ -136,34 +132,22 @@ const styles = StyleSheet.create({
   },
   textGroup: {
     flex: 1,
-    gap: 2,
+    gap: 4,
   },
-  metaRow: {
+  nameRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: Spacing.one,
-    marginVertical: 2,
+    gap: 6,
   },
-  clubTag: {
-    width: 20,
-    height: 20,
-    borderRadius: Radius.pill,
-    backgroundColor: `${Brand.secondary}26`,
-    alignItems: 'center',
-    justifyContent: 'center',
+  name: {
+    flexShrink: 1,
   },
-  addressRow: {
+  statusRow: {
     flexDirection: 'row',
-    gap: Spacing.one,
+    alignItems: 'center',
   },
-  address: {
+  hours: {
     flex: 1,
-  },
-  distance: {
-    fontWeight: '700',
-  },
-  trailing: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    marginLeft: 4,
   },
 });

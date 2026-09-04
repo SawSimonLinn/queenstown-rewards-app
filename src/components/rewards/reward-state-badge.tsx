@@ -8,8 +8,8 @@ export type RewardStateBadgeProps = {
 };
 
 const BADGE_COPY: Record<EntitlementStatus, { label: string; tone: StatusTone; solid?: boolean }> = {
-  eligible: { label: 'Your burger is ready', tone: 'success' },
-  redeemed: { label: 'Redeemed this month', tone: 'neutral', solid: true },
+  eligible: { label: 'Ready to redeem', tone: 'success' },
+  redeemed: { label: 'Redeemed', tone: 'neutral', solid: true },
   expired: { label: 'Expired', tone: 'danger' },
   ineligible: { label: 'Ineligible', tone: 'warning' },
 };
