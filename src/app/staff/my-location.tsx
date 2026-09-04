@@ -51,6 +51,7 @@ export default function MyLocationScreen() {
   if (profile && profile.role === 'customer') {
     return (
       <ScreenContainer>
+        <AppHeader title="My Location" onBackPress={() => router.back()} />
         <EmptyState
           icon="lock-closed-outline"
           title="Staff access only"
@@ -62,7 +63,7 @@ export default function MyLocationScreen() {
 
   return (
     <ScreenContainer scroll onRefresh={load} refreshing={state.status === 'loading'}>
-      <AppHeader title="My Location" />
+      <AppHeader title="My Location" onBackPress={() => router.back()} />
 
       {state.status === 'loading' && (
         <>
@@ -86,7 +87,7 @@ export default function MyLocationScreen() {
               location={location}
               isSelected={false}
               distanceLabel={null}
-              onPress={() => router.push(`/locations/${location.id}`)}
+              onPress={() => router.push(`/location/${location.id}`)}
             />
           ))
         ))}

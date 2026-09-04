@@ -201,6 +201,28 @@ export default function ProfileScreen() {
             />
           </Card>
 
+          {profile && profile.role !== 'customer' && (
+            <Card noPadding accessibilityLabel="Staff tools" style={styles.group}>
+              <SettingsRow
+                icon="qr-code-outline"
+                label="Requests"
+                onPress={() => router.push('/staff/requests')}
+              />
+              <SettingsRowDivider />
+              <SettingsRow
+                icon="storefront-outline"
+                label="My Location"
+                onPress={() => router.push('/staff/my-location')}
+              />
+              <SettingsRowDivider />
+              <SettingsRow
+                icon="pricetags-outline"
+                label="Manage"
+                onPress={() => router.push('/staff/manage')}
+              />
+            </Card>
+          )}
+
           <Card noPadding accessibilityLabel="Notification preferences" style={styles.group}>
             <View style={styles.switchRow}>
               <View style={styles.switchTextGroup}>

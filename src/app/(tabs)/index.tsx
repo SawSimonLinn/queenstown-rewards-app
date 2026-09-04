@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { useFocusEffect, useRouter } from 'expo-router';
+import { useFocusEffect } from 'expo-router';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
 import { BurgerClubHero, type HeroCtaState } from '@/components/burger/burger-club-hero';
@@ -32,6 +32,7 @@ import { useLocationPromptDismissed } from '@/hooks/use-location-prompt-dismisse
 import { useMembership } from '@/hooks/use-membership';
 import { useNearbyLocations } from '@/hooks/use-nearby-locations';
 import { useRecentlyViewedLocations } from '@/hooks/use-recently-viewed-locations';
+import { useSafePush } from '@/hooks/use-safe-push';
 import { useAuth } from '@/lib/auth';
 import { useNotificationInbox } from '@/lib/notification-inbox';
 import { usePreferredLocation } from '@/lib/preferred-location';
@@ -60,7 +61,7 @@ export default function HomeScreen() {
   const { locations: nearbyLocations, distanceLabelFor, permissionState, promptAndRequestLocation } =
     useNearbyLocations(preferredLocation);
   const { state: recentlyViewedState, recordView } = useRecentlyViewedLocations();
-  const router = useRouter();
+  const { push, router } = useSafePush();
   const { isDismissed: isLocationPromptDismissed, dismiss: dismissLocationPrompt } =
     useLocationPromptDismissed(session?.user.id);
   const [joinSheetVisible, setJoinSheetVisible] = useState(false);
@@ -81,9 +82,9 @@ export default function HomeScreen() {
   const goToLocation = useCallback(
     (locationId: string) => {
       recordView(locationId);
-      router.push(`/locations/${locationId}`);
+      push(`/location/${locationId}`);
     },
-    [recordView, router]
+    [recordView, push]
   );
 
   const heroCtaState: HeroCtaState = !session
@@ -179,7 +180,7 @@ export default function HomeScreen() {
             specials={state.data.specials.filter(
               (special) => getSpecialTimingState(special) === 'active'
             )}
-            onSpecialPress={(specialId) => router.push(`/specials/${specialId}`)}
+            onSpecialPress={(specialId) => push(`/specials/${specialId}`)}
             onSeeAllPress={() => router.push('/specials')}
           />
 

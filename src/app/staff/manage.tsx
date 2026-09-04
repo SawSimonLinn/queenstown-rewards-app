@@ -108,6 +108,7 @@ export default function ManageScreen() {
   if (profile && profile.role === 'customer') {
     return (
       <ScreenContainer>
+        <AppHeader title="Manage" onBackPress={() => router.back()} />
         <EmptyState
           icon="lock-closed-outline"
           title="Staff access only"
@@ -125,6 +126,7 @@ export default function ManageScreen() {
       <ScreenContainer scroll onRefresh={activeRetry} refreshing={activeState.status === 'loading'}>
         <AppHeader
           title="Manage"
+          onBackPress={() => router.back()}
           rightIcon="add"
           rightAccessibilityLabel={segment === 'specials' ? 'Add special' : 'Add campaign'}
           onRightPress={() =>

@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
@@ -26,6 +27,7 @@ import { REDEMPTION_STATUS_COPY } from '@/lib/redemption-status-copy';
 import type { StaffRedemption } from '@/services/staff';
 
 export default function RequestsScreen() {
+  const router = useRouter();
   const { profile } = useProfileContext();
   const [segment, setSegment] = useState<StaffRedemptionsSegment>('pending');
   const [locationId, setLocationId] = useState<string | null>(null);
@@ -38,6 +40,7 @@ export default function RequestsScreen() {
   if (profile && profile.role === 'customer') {
     return (
       <ScreenContainer>
+        <AppHeader eyebrow="Staff" title="Requests" onBackPress={() => router.back()} />
         <EmptyState
           icon="lock-closed-outline"
           title="Staff access only"
@@ -52,7 +55,7 @@ export default function RequestsScreen() {
 
   return (
     <ScreenContainer scroll onRefresh={retry} refreshing={state.status === 'loading'}>
-      <AppHeader eyebrow="Staff" title="Requests" />
+      <AppHeader eyebrow="Staff" title="Requests" onBackPress={() => router.back()} />
 
       <View style={styles.filters}>
         <SegmentedControl

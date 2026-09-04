@@ -97,7 +97,7 @@ function RootLayoutNav() {
     if (!pendingLocationId) return;
     const locationId = pendingLocationId;
     setPendingLocationId(null);
-    router.push(`/locations/${locationId}`);
+    router.push(`/location/${locationId}`);
   }, [
     session,
     isProfileLoading,
@@ -141,22 +141,25 @@ function RootLayoutNav() {
             options={{ headerShown: true, headerTitle: 'Notifications' }}
           />
           <Stack.Screen
-            name="burger/[id]"
-            options={{ headerShown: true, headerTitle: 'Burger of the Month' }}
+            name="reward/[id]"
+            options={{ headerShown: true, headerTitle: 'Reward details' }}
           />
-          <Stack.Screen name="locations/[id]" options={{ headerShown: false }} />
+          <Stack.Screen name="location/[id]" options={{ headerShown: false }} />
           <Stack.Screen
             name="redemption/confirm"
             options={{ headerShown: true, headerTitle: 'Before you redeem' }}
           />
           <Stack.Screen
             name="redemption/scan"
-            options={{ headerShown: true, headerTitle: 'Scan to redeem' }}
+            options={{ headerShown: false, presentation: 'fullScreenModal' }}
           />
           <Stack.Screen
             name="redemption/review"
-            options={{ headerShown: true, headerTitle: 'Review redemption' }}
+            options={{ headerShown: true, headerTitle: 'Redemption result' }}
           />
+          <Stack.Screen name="staff/requests" options={{ headerShown: false }} />
+          <Stack.Screen name="staff/my-location" options={{ headerShown: false }} />
+          <Stack.Screen name="staff/manage" options={{ headerShown: false }} />
           <Stack.Screen
             name="staff/special-form"
             options={{ headerShown: true, headerTitle: 'Special' }}

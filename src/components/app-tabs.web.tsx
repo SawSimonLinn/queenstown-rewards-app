@@ -30,11 +30,11 @@ export default function AppTabs() {
           <TabTrigger name="home" href="/" asChild>
             <TabButton icon={TAB_ICONS.home}>Home</TabButton>
           </TabTrigger>
-          <TabTrigger name="rewards" href="/rewards" asChild>
-            <TabButton icon={TAB_ICONS.rewards}>Rewards</TabButton>
-          </TabTrigger>
           <TabTrigger name="locations" href="/locations" asChild>
             <TabButton icon={TAB_ICONS.locations}>Locations</TabButton>
+          </TabTrigger>
+          <TabTrigger name="rewards" href="/rewards" asChild>
+            <TabButton icon={TAB_ICONS.rewards}>Rewards</TabButton>
           </TabTrigger>
           <TabTrigger name="profile" href="/profile" asChild>
             <TabButton icon={TAB_ICONS.profile}>Profile</TabButton>

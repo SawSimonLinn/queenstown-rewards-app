@@ -1,5 +1,4 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
@@ -23,6 +22,7 @@ import { QUEENSTOWN_LOCATIONS } from '@/data/locations';
 import { useHomeScreenData } from '@/hooks/use-home-screen-data';
 import { useMembership } from '@/hooks/use-membership';
 import { useRedemptionHistory } from '@/hooks/use-redemption-history';
+import { useSafePush } from '@/hooks/use-safe-push';
 import { formatDate } from '@/lib/format';
 import { usePreferredLocation } from '@/lib/preferred-location';
 import { useProfileContext } from '@/lib/profile';
@@ -58,7 +58,7 @@ export default function RewardsScreen() {
   } = useMembership();
   const { preferredLocation } = usePreferredLocation();
   const { profile } = useProfileContext();
-  const router = useRouter();
+  const { push, router } = useSafePush();
   const [joinSheetVisible, setJoinSheetVisible] = useState(false);
 
   const isMember = membershipState.status === 'success' && !!membershipState.membership;
@@ -74,7 +74,7 @@ export default function RewardsScreen() {
         title="Rewards"
         rightIcon="qr-code-outline"
         rightAccessibilityLabel="Scan QR code"
-        onRightPress={() => router.push('/redemption/scan')}
+        onRightPress={() => push('/redemption/scan')}
       />
       {refreshError && <InlineFeedback message={refreshError} />}
 
@@ -138,6 +138,10 @@ export default function RewardsScreen() {
                   participatingLocationCount={PARTICIPATING_LOCATION_COUNT}
                   onRedeemPress={() => router.push('/redemption/confirm')}
                   onViewTermsPress={() => router.push('/burger-club/terms')}
+                  onViewDetailsPress={() => {
+                    const campaignId = state.status === 'success' && state.data.campaign?.id;
+                    if (campaignId) push(`/reward/${campaignId}`);
+                  }}
                 />
               </FadeInView>
             ) : (
