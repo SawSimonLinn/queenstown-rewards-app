@@ -21,6 +21,7 @@ export type ClubRewardCardProps = {
   participatingLocationCount: number;
   onRedeemPress: () => void;
   onViewTermsPress: () => void;
+  onViewDetailsPress: () => void;
 };
 
 export function ClubRewardCard({
@@ -32,6 +33,7 @@ export function ClubRewardCard({
   participatingLocationCount,
   onRedeemPress,
   onViewTermsPress,
+  onViewDetailsPress,
 }: ClubRewardCardProps) {
   const canRedeem = isRedeemable(status);
   const isRedeemed = status === 'redeemed';
@@ -49,23 +51,37 @@ export function ClubRewardCard({
       style={styles.card}
     >
       <View style={[styles.passHeader, !canRedeem && styles.passHeaderMuted]}>
-        <View style={styles.passMark}>
-          <ThemedText type="editorial" style={styles.passMarkText}>
-            Q
-          </ThemedText>
+        <View style={styles.passHeaderTop}>
+          <View style={[styles.passMark, !canRedeem && styles.passMarkMuted]}>
+            <ThemedText
+              type="editorial"
+              style={[styles.passMarkText, !canRedeem && styles.passMarkTextMuted]}
+            >
+              Q
+            </ThemedText>
+          </View>
+          <View style={styles.passHeaderText}>
+            <ThemedText
+              type="eyebrow"
+              numberOfLines={1}
+              style={[styles.passEyebrow, !canRedeem && styles.passTextMuted]}
+            >
+              Burger Club Pass
+            </ThemedText>
+            <ThemedText
+              type="small"
+              numberOfLines={1}
+              style={[styles.passSubcopy, !canRedeem && styles.passTextMuted]}
+            >
+              {formatPeriod(periodMonth)}
+            </ThemedText>
+          </View>
         </View>
-        <View style={styles.passHeaderText}>
-          <ThemedText
-            type="eyebrow"
-            style={[styles.passEyebrow, !canRedeem && styles.passTextMuted]}
-          >
-            Burger Club Pass
-          </ThemedText>
-          <ThemedText type="small" style={[styles.passSubcopy, !canRedeem && styles.passTextMuted]}>
-            {formatPeriod(periodMonth)}
-          </ThemedText>
-        </View>
-        <RewardStateBadge status={status} />
+        {isRedeemed ? null : (
+          <View style={styles.passHeaderBadge}>
+            <RewardStateBadge status={status} />
+          </View>
+        )}
       </View>
       <OrganicEdge color={Brand.onPrimary} height={16} />
 
@@ -80,10 +96,7 @@ export function ClubRewardCard({
         />
 
         <View style={styles.body}>
-          <ThemedText type="editorial">{campaign.name}</ThemedText>
-          <ThemedText type="small" themeColor="textSecondary">
-            Member: {memberName ?? 'Queenstown Rewards member'}
-          </ThemedText>
+          <ThemedText type="editorial">{memberName ?? campaign.name}</ThemedText>
           <ThemedText type="small" themeColor="textSecondary">
             Expires {formatDate(campaign.endDate)}
           </ThemedText>
@@ -94,14 +107,10 @@ export function ClubRewardCard({
 
       <View style={styles.metaList}>
         <PassLine
-          icon="storefront-outline"
-          label="Participating restaurants"
-          value={`${participatingLocationCount} locations`}
-        />
-        <PassLine
           icon="location-outline"
           label="Selected restaurant"
           value={preferredLocationName ?? 'Choose one in Locations'}
+          hint={`${participatingLocationCount} locations`}
         />
         <PassLine
           icon="restaurant-outline"
@@ -113,9 +122,17 @@ export function ClubRewardCard({
 
       <View style={styles.actions}>
         <Button label={actionLabel} onPress={onRedeemPress} disabled={!canRedeem} size="large" />
-        <ThemedText type="linkPrimary" onPress={onViewTermsPress} style={styles.termsLink}>
-          View Burger Club terms
-        </ThemedText>
+        <View style={styles.termsRow}>
+          <ThemedText type="linkPrimary" onPress={onViewDetailsPress}>
+            Reward details
+          </ThemedText>
+          <ThemedText type="small" themeColor="textSecondary">
+            {' · '}
+          </ThemedText>
+          <ThemedText type="linkPrimary" onPress={onViewTermsPress}>
+            Club terms
+          </ThemedText>
+        </View>
       </View>
     </Card>
   );
@@ -125,11 +142,13 @@ function PassLine({
   icon,
   label,
   value,
+  hint,
   emphasized,
 }: {
   icon: keyof typeof Ionicons.glyphMap;
   label: string;
   value: string;
+  hint?: string;
   emphasized?: boolean;
 }) {
   return (
@@ -147,6 +166,11 @@ function PassLine({
           {value}
         </ThemedText>
       </View>
+      {hint ? (
+        <ThemedText type="small" themeColor="textSecondary">
+          {hint}
+        </ThemedText>
+      ) : null}
     </View>
   );
 }
@@ -168,25 +192,38 @@ const styles = StyleSheet.create({
   passHeader: {
     backgroundColor: Brand.primary,
     padding: Spacing.three,
-    flexDirection: 'row',
-    alignItems: 'center',
     gap: Spacing.two,
   },
   passHeaderMuted: {
     backgroundColor: Brand.mutedSurface,
   },
+  passHeaderTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.two,
+  },
+  passHeaderBadge: {
+    alignSelf: 'flex-start',
+    marginLeft: 40 + Spacing.two,
+  },
   passMark: {
     width: 40,
     height: 40,
     borderRadius: Radius.small,
-    backgroundColor: Brand.onPrimary,
+    backgroundColor: Brand.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
+  passMarkMuted: {
+    backgroundColor: Brand.onPrimary,
+  },
   passMarkText: {
-    color: Brand.primary,
+    color: Brand.onPrimary,
     fontSize: 22,
     lineHeight: 26,
+  },
+  passMarkTextMuted: {
+    color: Brand.primary,
   },
   passHeaderText: {
     flex: 1,
@@ -210,11 +247,13 @@ const styles = StyleSheet.create({
   },
   divider: {
     marginHorizontal: Spacing.three,
+    marginBottom: Spacing.three,
     borderTopWidth: 1,
     borderColor: `${Brand.charcoal}14`,
   },
   metaList: {
     paddingHorizontal: Spacing.three,
+    paddingBottom: Spacing.one,
     gap: Spacing.two,
   },
   passLine: {
@@ -233,7 +272,8 @@ const styles = StyleSheet.create({
     padding: Spacing.three,
     gap: Spacing.two,
   },
-  termsLink: {
+  termsRow: {
+    flexDirection: 'row',
     alignSelf: 'center',
   },
 });

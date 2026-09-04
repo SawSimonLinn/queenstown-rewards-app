@@ -42,7 +42,7 @@ export function AppHeader({
         )}
         {!onBackPress && (
           <View style={styles.brandMark} accessibilityElementsHidden>
-            <ThemedText type="smallBold" style={styles.brandMarkText}>
+            <ThemedText type="editorial" style={styles.brandMarkText}>
               Q
             </ThemedText>
           </View>
@@ -97,8 +97,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   brandMark: {
-    width: 36,
-    height: 36,
+    width: 40,
+    height: 40,
     borderRadius: Radius.small,
     backgroundColor: Brand.primary,
     alignItems: 'center',
@@ -106,7 +106,8 @@ const styles = StyleSheet.create({
   },
   brandMarkText: {
     color: Brand.onPrimary,
-    fontSize: 18,
+    fontSize: 22,
+    lineHeight: 26,
   },
   titleGroup: {
     flex: 1,
