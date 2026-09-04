@@ -1,6 +1,6 @@
 import { StyleSheet, View } from 'react-native';
 
-import { OpenStatusBadge } from '@/components/locations/open-status-badge';
+import { OpenStatusDot } from '@/components/locations/open-status-badge';
 import { ThemedText } from '@/components/themed-text';
 import { Card } from '@/components/ui/card';
 import { FadingImage } from '@/components/ui/fading-image';
@@ -16,7 +16,7 @@ export type LocationCardProps = {
   onPress: () => void;
 };
 
-/** Compact carousel card shared by Home's "Near you" and "Recently viewed" sections. */
+/** Compact carousel card used by Home's "Near you" section. */
 export function LocationCard({ location, distanceLabel, onPress }: LocationCardProps) {
   const status = getLocationStatus(location);
   const thumbnail = getLocationImages(location.id).logo ?? getLocationImages(location.id).hero;
@@ -30,7 +30,7 @@ export function LocationCard({ location, distanceLabel, onPress }: LocationCardP
     >
       <FadingImage
         source={thumbnail}
-        height={112}
+        height={132}
         radius={0}
         fallbackIcon="storefront"
         fallbackSize="small"
@@ -42,15 +42,20 @@ export function LocationCard({ location, distanceLabel, onPress }: LocationCardP
         </ThemedText>
 
         <View style={styles.metaRow}>
-          <OpenStatusBadge status={status} />
+          <OpenStatusDot status={status} />
           {distanceLabel && (
-            <ThemedText type="small" themeColor="textSecondary">
-              {distanceLabel}
-            </ThemedText>
+            <>
+              <ThemedText type="small" themeColor="textMuted">
+                {' · '}
+              </ThemedText>
+              <ThemedText type="small" themeColor="textSecondary" numberOfLines={1}>
+                {distanceLabel}
+              </ThemedText>
+            </>
           )}
         </View>
 
-        <ThemedText type="small" themeColor="textMuted" numberOfLines={1} style={styles.address}>
+        <ThemedText type="small" themeColor="textMuted" numberOfLines={1}>
           {getFullAddress(location)}
         </ThemedText>
       </View>
@@ -65,15 +70,10 @@ const styles = StyleSheet.create({
   },
   body: {
     padding: Spacing.three,
-    gap: 8,
+    gap: 4,
   },
   metaRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: Spacing.one,
-  },
-  address: {
-    marginTop: -2,
   },
 });

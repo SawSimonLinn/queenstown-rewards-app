@@ -12,6 +12,7 @@ import { ScreenContainer } from '@/components/ui/screen-container';
 import { SpecialCardSkeleton } from '@/components/ui/skeleton';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { Spacing } from '@/constants/theme';
+import { pickStockImage, STOCK_SPECIAL_IMAGES } from '@/data/stock-images';
 import { useSpecials } from '@/hooks/use-specials';
 import { formatDateRange } from '@/lib/format';
 import { getSpecialTiming } from '@/lib/special-timing';
@@ -60,7 +61,7 @@ export default function SpecialsFeedScreen() {
                     style={styles.card}
                   >
                     <FadingImage
-                      source={special.imageUrl}
+                      source={special.imageUrl ?? pickStockImage(STOCK_SPECIAL_IMAGES, special.id)}
                       height={110}
                       radius={0}
                       fallbackIcon="pricetag"

@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import type { ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
@@ -14,6 +15,7 @@ import { ScreenContainer } from '@/components/ui/screen-container';
 import { HeroCardSkeleton } from '@/components/ui/skeleton';
 import { IS_SAMPLE_DATA, MAX_REDEMPTIONS_PER_PERIOD, REWARD_PERIOD } from '@/constants/app';
 import { Brand, IconSize, Radius, Spacing } from '@/constants/theme';
+import { pickStockImage, STOCK_BURGER_IMAGES } from '@/data/stock-images';
 import { useBurgerCampaignDetail } from '@/hooks/use-burger-campaign-detail';
 import { isRedeemable } from '@/lib/eligibility';
 import { formatDateRange } from '@/lib/format';
@@ -74,28 +76,42 @@ function BurgerOfMonthDetail({ data, onRedeemPress }: BurgerOfMonthDetailProps) 
     <>
       <View style={styles.hero}>
         <FadingImage
-          source={campaign.imageUrl}
+          source={campaign.imageUrl ?? pickStockImage(STOCK_BURGER_IMAGES, campaign.id)}
           height={300}
           radius={0}
           fallbackIcon="fast-food"
           fallbackLabel="Burger of the Month"
         />
+
+        <LinearGradient
+          colors={['rgba(0,0,0,0.55)', 'rgba(0,0,0,0)']}
+          style={styles.heroTopScrim}
+          pointerEvents="none"
+        />
+        <LinearGradient
+          colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.82)']}
+          style={styles.heroBottomScrim}
+          pointerEvents="none"
+        />
+
+        <View style={styles.heroContent}>
+          <View style={styles.passRow}>
+            <View style={styles.passStamp}>
+              <Ionicons name="ribbon" size={16} color={Brand.onPrimary} />
+              <ThemedText type="eyebrow" style={styles.passStampText}>
+                Monthly campaign
+              </ThemedText>
+            </View>
+            <RewardStateBadge status={status} />
+          </View>
+
+          <ThemedText type="display" style={styles.name}>
+            {campaign.name}
+          </ThemedText>
+        </View>
       </View>
 
       <View style={[styles.content, styles.padded]}>
-        <View style={styles.passRow}>
-          <View style={styles.passStamp}>
-            <Ionicons name="ribbon" size={16} color={Brand.onPrimary} />
-            <ThemedText type="eyebrow" style={styles.passStampText}>
-              Monthly campaign
-            </ThemedText>
-          </View>
-          <RewardStateBadge status={status} />
-        </View>
-
-        <ThemedText type="display" style={styles.name}>
-          {campaign.name}
-        </ThemedText>
         <ThemedText themeColor="textSecondary" style={styles.description}>
           {campaign.description}
         </ThemedText>
@@ -219,6 +235,30 @@ const styles = StyleSheet.create({
   },
   hero: {
     backgroundColor: Brand.primaryTint,
+    overflow: 'hidden',
+  },
+  heroTopScrim: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 90,
+  },
+  heroBottomScrim: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 160,
+  },
+  heroContent: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    padding: Spacing.four,
+    justifyContent: 'space-between',
   },
   content: {
     backgroundColor: Brand.onPrimary,
@@ -248,7 +288,7 @@ const styles = StyleSheet.create({
     color: Brand.onPrimary,
   },
   name: {
-    color: Brand.charcoal,
+    color: Brand.onPrimary,
   },
   description: {
     fontSize: 17,

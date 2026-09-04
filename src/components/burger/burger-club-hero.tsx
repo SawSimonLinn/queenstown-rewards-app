@@ -9,6 +9,7 @@ import { Card } from '@/components/ui/card';
 import { FadingImage } from '@/components/ui/fading-image';
 import { IS_SAMPLE_DATA } from '@/constants/app';
 import { Brand, Radius, Shadows, Spacing } from '@/constants/theme';
+import { pickStockImage, STOCK_BURGER_IMAGES } from '@/data/stock-images';
 import type { RestaurantLocation } from '@/data/types';
 import { isRedeemable } from '@/lib/eligibility';
 import { formatDate } from '@/lib/format';
@@ -44,52 +45,71 @@ export function BurgerClubHero({
 
   return (
     <Card noPadding elevated style={styles.card} accessibilityLabel="Burger of the Month Club">
-      <LinearGradient
-        colors={[Brand.primary, Brand.primaryDark, Brand.secondary]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.ticketTop}
-      >
-        <View style={styles.stubRow}>
-          <View style={styles.eyebrowRow}>
-            <Ionicons name="ribbon" size={16} color={Brand.onPrimary} />
-            <ThemedText type="eyebrow" style={styles.eyebrowText}>
-              Burger Club
-            </ThemedText>
-          </View>
-          {entitlement && <RewardStateBadge status={entitlement.status} />}
-        </View>
-
-        <ThemedText type="display" style={styles.heroHeading}>
-          Burger of the Month
-        </ThemedText>
-
-        {campaign && (
+      <View style={styles.hero}>
+        {campaign ? (
           <FadingImage
-            source={campaign.imageUrl}
-            height={174}
-            radius={Radius.medium}
+            source={campaign.imageUrl ?? pickStockImage(STOCK_BURGER_IMAGES, campaign.id)}
+            height={260}
+            radius={0}
             fallbackIcon="fast-food"
             fallbackLabel="Burger campaign crop"
           />
+        ) : (
+          <LinearGradient
+            colors={[Brand.primary, Brand.primaryDark, Brand.secondary]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.heroFallback}
+          />
         )}
-      </LinearGradient>
+
+        <LinearGradient
+          colors={['rgba(0,0,0,0.55)', 'rgba(0,0,0,0)']}
+          style={styles.heroTopScrim}
+          pointerEvents="none"
+        />
+        <LinearGradient
+          colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.82)']}
+          style={styles.heroBottomScrim}
+          pointerEvents="none"
+        />
+
+        <View style={styles.heroContent}>
+          <View style={styles.stubRow}>
+            <View style={styles.eyebrowRow}>
+              <Ionicons name="ribbon" size={16} color={Brand.onPrimary} />
+              <ThemedText type="eyebrow" style={styles.eyebrowText}>
+                Burger Club
+              </ThemedText>
+            </View>
+            {entitlement && <RewardStateBadge status={entitlement.status} />}
+          </View>
+
+          <View style={styles.heroTextBlock}>
+            <ThemedText type="display" style={styles.heroHeading}>
+              Burger of the Month
+            </ThemedText>
+            {campaign && (
+              <View style={styles.nameRow}>
+                <ThemedText type="editorial" style={styles.name}>
+                  {campaign.name}
+                </ThemedText>
+                {IS_SAMPLE_DATA && (
+                  <View style={styles.previewTag}>
+                    <ThemedText type="smallBold" style={styles.previewText}>
+                      Preview
+                    </ThemedText>
+                  </View>
+                )}
+              </View>
+            )}
+          </View>
+        </View>
+      </View>
 
       <View style={styles.body}>
         {campaign ? (
           <>
-            <View style={styles.nameRow}>
-              <ThemedText type="editorial" style={styles.name}>
-                {campaign.name}
-              </ThemedText>
-              {IS_SAMPLE_DATA && (
-                <View style={styles.previewTag}>
-                  <ThemedText type="smallBold" style={styles.previewText}>
-                    Preview
-                  </ThemedText>
-                </View>
-              )}
-            </View>
             <ThemedText themeColor="textSecondary" numberOfLines={2}>
               {campaign.description}
             </ThemedText>
@@ -149,11 +169,35 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     ...Shadows.raised,
   },
-  ticketTop: {
-    paddingHorizontal: Spacing.four,
-    paddingTop: Spacing.four,
-    paddingBottom: Spacing.five,
-    gap: Spacing.three,
+  hero: {
+    overflow: 'hidden',
+  },
+  heroFallback: {
+    height: 260,
+    width: '100%',
+  },
+  heroTopScrim: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 90,
+  },
+  heroBottomScrim: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 150,
+  },
+  heroContent: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    padding: Spacing.four,
+    justifyContent: 'space-between',
   },
   stubRow: {
     flexDirection: 'row',
@@ -166,13 +210,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 6,
     alignSelf: 'flex-start',
-    backgroundColor: 'rgba(255,255,255,0.18)',
+    backgroundColor: 'rgba(255,255,255,0.22)',
     paddingHorizontal: Spacing.three,
     paddingVertical: 6,
     borderRadius: Radius.pill,
   },
   eyebrowText: {
     color: Brand.onPrimary,
+  },
+  heroTextBlock: {
+    gap: Spacing.one,
   },
   heroHeading: {
     color: Brand.onPrimary,
@@ -189,15 +236,16 @@ const styles = StyleSheet.create({
   },
   name: {
     flex: 1,
+    color: Brand.onPrimary,
   },
   previewTag: {
     paddingHorizontal: Spacing.two,
     paddingVertical: 4,
     borderRadius: Radius.small,
-    backgroundColor: `${Brand.secondary}33`,
+    backgroundColor: 'rgba(255,255,255,0.22)',
   },
   previewText: {
-    color: Brand.secondaryDark,
+    color: Brand.onPrimary,
     fontWeight: '700',
   },
   metaGrid: {

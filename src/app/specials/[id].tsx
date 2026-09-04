@@ -11,6 +11,7 @@ import { ScreenContainer } from '@/components/ui/screen-container';
 import { HeroCardSkeleton } from '@/components/ui/skeleton';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { Brand, IconSize, Spacing } from '@/constants/theme';
+import { pickStockImage, STOCK_SPECIAL_IMAGES } from '@/data/stock-images';
 import { useSpecialDetail } from '@/hooks/use-special-detail';
 import { formatDateRange } from '@/lib/format';
 import { getSpecialTiming } from '@/lib/special-timing';
@@ -49,7 +50,10 @@ export default function SpecialDetailScreen() {
           return (
             <FadeInView slide layout style={styles.contentGroup}>
               <FadingImage
-                source={state.data.special.imageUrl}
+                source={
+                  state.data.special.imageUrl ??
+                  pickStockImage(STOCK_SPECIAL_IMAGES, state.data.special.id)
+                }
                 height={190}
                 fallbackIcon="pricetag"
                 fallbackLabel="Sample special photo"

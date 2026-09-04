@@ -31,7 +31,6 @@ import { useHomeScreenData } from '@/hooks/use-home-screen-data';
 import { useLocationPromptDismissed } from '@/hooks/use-location-prompt-dismissed';
 import { useMembership } from '@/hooks/use-membership';
 import { useNearbyLocations } from '@/hooks/use-nearby-locations';
-import { useRecentlyViewedLocations } from '@/hooks/use-recently-viewed-locations';
 import { useSafePush } from '@/hooks/use-safe-push';
 import { useAuth } from '@/lib/auth';
 import { useNotificationInbox } from '@/lib/notification-inbox';
@@ -60,7 +59,6 @@ export default function HomeScreen() {
   } = useMembership();
   const { locations: nearbyLocations, distanceLabelFor, permissionState, promptAndRequestLocation } =
     useNearbyLocations(preferredLocation);
-  const { state: recentlyViewedState, recordView } = useRecentlyViewedLocations();
   const { push, router } = useSafePush();
   const { isDismissed: isLocationPromptDismissed, dismiss: dismissLocationPrompt } =
     useLocationPromptDismissed(session?.user.id);
@@ -81,10 +79,9 @@ export default function HomeScreen() {
 
   const goToLocation = useCallback(
     (locationId: string) => {
-      recordView(locationId);
       push(`/location/${locationId}`);
     },
-    [recordView, push]
+    [push]
   );
 
   const heroCtaState: HeroCtaState = !session
@@ -193,13 +190,6 @@ export default function HomeScreen() {
             onSeeAllPress={() => router.push('/(tabs)/locations')}
           />
 
-          {recentlyViewedState.status === 'success' && recentlyViewedState.locations.length > 0 && (
-            <RecentlyViewedSection
-              locations={recentlyViewedState.locations}
-              onLocationPress={goToLocation}
-            />
-          )}
-
           <ThemedText
             type="linkPrimary"
             style={styles.howItWorksLink}
@@ -306,33 +296,6 @@ function NearYouSection({
             key={location.id}
             location={location}
             distanceLabel={distanceLabelFor(location)}
-            onPress={() => onLocationPress(location.id)}
-          />
-        ))}
-      </ScrollView>
-    </>
-  );
-}
-
-function RecentlyViewedSection({
-  locations,
-  onLocationPress,
-}: {
-  locations: RestaurantLocation[];
-  onLocationPress: (locationId: string) => void;
-}) {
-  return (
-    <>
-      <SectionHeader title="Recently viewed" />
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.horizontalRow}
-      >
-        {locations.map((location) => (
-          <LocationCard
-            key={location.id}
-            location={location}
             onPress={() => onLocationPress(location.id)}
           />
         ))}

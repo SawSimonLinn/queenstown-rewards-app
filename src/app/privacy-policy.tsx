@@ -26,7 +26,7 @@ const SECTIONS: Section[] = [
   {
     title: 'How we use it',
     paragraphs: [
-      `We use your information to operate ${APP_NAME}: authenticating your account, tracking and validating reward redemptions, preventing duplicate or fraudulent redemptions, and personalizing content such as recently viewed locations and preferred-location specials.`,
+      `We use your information to operate ${APP_NAME}: authenticating your account, tracking and validating reward redemptions, preventing duplicate or fraudulent redemptions, and personalizing content such as preferred-location specials.`,
       'We do not sell your personal information to third parties.',
     ],
   },

@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useRef, useState, type ReactNode } from 'react';
 import {
   Alert,
   Linking,
@@ -24,7 +24,6 @@ import { Brand, IconSize, MinTouchTarget, Radius, Shadows, Spacing } from '@/con
 import { getRestaurantLocationById } from '@/data/locations';
 import { getLocationImages } from '@/data/location-images';
 import type { RestaurantLocation } from '@/data/types';
-import { useRecentlyViewedLocations } from '@/hooks/use-recently-viewed-locations';
 import { useTabBarBottomPadding } from '@/hooks/use-tab-bar-bottom-padding';
 import { getDirectionsUrl, getFullAddress, getPhoneCallUrl } from '@/lib/maps';
 import {
@@ -98,15 +97,6 @@ function LocationDetail({
   const images = getLocationImages(location.id);
   const [weeklyExpanded, setWeeklyExpanded] = useState(false);
   const [viewerIndex, setViewerIndex] = useState<number | null>(null);
-  const { recordView } = useRecentlyViewedLocations();
-
-  useEffect(() => {
-    recordView(location.id);
-    // Only re-fires when the viewed location itself changes, not on every
-    // recordView identity change (it depends on session, which shouldn't
-    // re-record the same view).
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.id]);
 
   const brunch = hasBrunchService(location);
   const happyHour = hasHappyHourService(location);

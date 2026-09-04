@@ -4,6 +4,7 @@ import { ThemedText } from '@/components/themed-text';
 import { Card } from '@/components/ui/card';
 import { FadingImage } from '@/components/ui/fading-image';
 import { Brand, Spacing } from '@/constants/theme';
+import { pickStockImage, STOCK_SPECIAL_IMAGES } from '@/data/stock-images';
 import { formatDateRange } from '@/lib/format';
 import type { Special } from '@/types';
 
@@ -24,7 +25,7 @@ export function SpecialCard({ special, onPress, variant = 'compact' }: SpecialCa
       style={[styles.card, isFeature && styles.featureCard]}
     >
       <FadingImage
-        source={special.imageUrl}
+        source={special.imageUrl ?? pickStockImage(STOCK_SPECIAL_IMAGES, special.id)}
         height={isFeature ? 132 : 96}
         radius={0}
         fallbackIcon="pricetag"

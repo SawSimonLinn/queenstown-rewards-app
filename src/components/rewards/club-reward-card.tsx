@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { StyleSheet, View } from 'react-native';
 
 import { RewardStateBadge } from '@/components/rewards/reward-state-badge';
@@ -6,8 +7,8 @@ import { ThemedText } from '@/components/themed-text';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { FadingImage } from '@/components/ui/fading-image';
-import { OrganicEdge } from '@/components/ui/organic-edge';
 import { Brand, IconSize, Radius, Spacing } from '@/constants/theme';
+import { pickStockImage, STOCK_BURGER_IMAGES } from '@/data/stock-images';
 import { isRedeemable } from '@/lib/eligibility';
 import { formatDate } from '@/lib/format';
 import type { BurgerCampaign, EntitlementStatus } from '@/types';
@@ -50,56 +51,46 @@ export function ClubRewardCard({
       accessibilityLabel="Your monthly burger"
       style={styles.card}
     >
-      <View style={[styles.passHeader, !canRedeem && styles.passHeaderMuted]}>
-        <View style={styles.passHeaderTop}>
-          <View style={[styles.passMark, !canRedeem && styles.passMarkMuted]}>
-            <ThemedText
-              type="editorial"
-              style={[styles.passMarkText, !canRedeem && styles.passMarkTextMuted]}
-            >
-              Q
-            </ThemedText>
-          </View>
-          <View style={styles.passHeaderText}>
-            <ThemedText
-              type="eyebrow"
-              numberOfLines={1}
-              style={[styles.passEyebrow, !canRedeem && styles.passTextMuted]}
-            >
-              Burger Club Pass
-            </ThemedText>
-            <ThemedText
-              type="small"
-              numberOfLines={1}
-              style={[styles.passSubcopy, !canRedeem && styles.passTextMuted]}
-            >
-              {formatPeriod(periodMonth)}
-            </ThemedText>
-          </View>
-        </View>
-        {isRedeemed ? null : (
-          <View style={styles.passHeaderBadge}>
-            <RewardStateBadge status={status} />
-          </View>
-        )}
-      </View>
-      <OrganicEdge color={Brand.onPrimary} height={16} />
-
-      <View style={styles.ticketBody}>
+      <View style={styles.hero}>
         <FadingImage
-          source={campaign.imageUrl}
-          height={156}
-          radius={Radius.medium}
+          source={campaign.imageUrl ?? pickStockImage(STOCK_BURGER_IMAGES, campaign.id)}
+          height={220}
+          radius={0}
           fallbackIcon={canRedeem ? 'fast-food' : 'fast-food-outline'}
           fallbackLabel="Monthly burger crop"
           fallbackTone="golden"
         />
 
-        <View style={styles.body}>
-          <ThemedText type="editorial">{memberName ?? campaign.name}</ThemedText>
-          <ThemedText type="small" themeColor="textSecondary">
-            Expires {formatDate(campaign.endDate)}
-          </ThemedText>
+        <LinearGradient
+          colors={['rgba(0,0,0,0.5)', 'rgba(0,0,0,0)']}
+          style={styles.heroTopScrim}
+          pointerEvents="none"
+        />
+        <LinearGradient
+          colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.8)']}
+          style={styles.heroBottomScrim}
+          pointerEvents="none"
+        />
+
+        <View style={styles.heroContent}>
+          <View style={styles.passHeaderTop}>
+            <View style={styles.eyebrowRow}>
+              <Ionicons name="ribbon" size={16} color={Brand.onPrimary} />
+              <ThemedText type="eyebrow" numberOfLines={1} style={styles.passEyebrow}>
+                Burger Club Pass
+              </ThemedText>
+            </View>
+            {isRedeemed ? null : <RewardStateBadge status={status} />}
+          </View>
+
+          <View style={styles.heroTextBlock}>
+            <ThemedText type="editorial" style={styles.passName}>
+              {memberName ?? campaign.name}
+            </ThemedText>
+            <ThemedText type="small" style={styles.passSubcopy}>
+              Expires {formatDate(campaign.endDate)} · {formatPeriod(periodMonth)}
+            </ThemedText>
+          </View>
         </View>
       </View>
 
@@ -189,64 +180,63 @@ const styles = StyleSheet.create({
   card: {
     overflow: 'hidden',
   },
-  passHeader: {
-    backgroundColor: Brand.primary,
-    padding: Spacing.three,
-    gap: Spacing.two,
+  hero: {
+    overflow: 'hidden',
   },
-  passHeaderMuted: {
-    backgroundColor: Brand.mutedSurface,
+  heroTopScrim: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 72,
+  },
+  heroBottomScrim: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 120,
+  },
+  heroContent: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    padding: Spacing.three,
+    justifyContent: 'space-between',
   },
   passHeaderTop: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     gap: Spacing.two,
   },
-  passHeaderBadge: {
-    alignSelf: 'flex-start',
-    marginLeft: 40 + Spacing.two,
-  },
-  passMark: {
-    width: 40,
-    height: 40,
-    borderRadius: Radius.small,
-    backgroundColor: Brand.primary,
+  eyebrowRow: {
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    gap: 6,
+    alignSelf: 'flex-start',
+    backgroundColor: 'rgba(255,255,255,0.22)',
+    paddingHorizontal: Spacing.three,
+    paddingVertical: 6,
+    borderRadius: Radius.pill,
   },
-  passMarkMuted: {
-    backgroundColor: Brand.onPrimary,
-  },
-  passMarkText: {
-    color: Brand.onPrimary,
-    fontSize: 22,
-    lineHeight: 26,
-  },
-  passMarkTextMuted: {
-    color: Brand.primary,
-  },
-  passHeaderText: {
-    flex: 1,
+  heroTextBlock: {
     gap: 2,
   },
   passEyebrow: {
     color: Brand.onPrimary,
   },
+  passName: {
+    color: Brand.onPrimary,
+  },
   passSubcopy: {
     color: Brand.onPrimary,
   },
-  passTextMuted: {
-    color: Brand.charcoal,
-  },
-  ticketBody: {
-    padding: Spacing.three,
-    gap: Spacing.three,
-  },
-  body: {
-    gap: 4,
-  },
   divider: {
     marginHorizontal: Spacing.three,
+    marginTop: Spacing.three,
     marginBottom: Spacing.three,
     borderTopWidth: 1,
     borderColor: `${Brand.charcoal}14`,
