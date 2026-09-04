@@ -172,10 +172,7 @@ function RootLayoutNav() {
             name="specials/index"
             options={{ headerShown: true, headerTitle: 'Specials' }}
           />
-          <Stack.Screen
-            name="specials/[id]"
-            options={{ headerShown: true, headerTitle: 'Special' }}
-          />
+          <Stack.Screen name="specials/[id]" options={{ headerShown: false }} />
           <Stack.Screen
             name="burger-club/how-it-works"
             options={{ headerShown: true, headerTitle: 'How It Works' }}

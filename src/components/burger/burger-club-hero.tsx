@@ -82,7 +82,7 @@ export function BurgerClubHero({
                 Burger Club
               </ThemedText>
             </View>
-            {entitlement && <RewardStateBadge status={entitlement.status} />}
+            {entitlement && <RewardStateBadge status={entitlement.status} solid />}
           </View>
 
           <View style={styles.heroTextBlock}>

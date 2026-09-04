@@ -102,7 +102,7 @@ function BurgerOfMonthDetail({ data, onRedeemPress }: BurgerOfMonthDetailProps) 
                 Monthly campaign
               </ThemedText>
             </View>
-            <RewardStateBadge status={status} />
+            <RewardStateBadge status={status} solid />
           </View>
 
           <ThemedText type="display" style={styles.name}>

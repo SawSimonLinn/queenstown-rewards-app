@@ -3,6 +3,8 @@ import type { EntitlementStatus } from '@/types';
 
 export type RewardStateBadgeProps = {
   status: EntitlementStatus;
+  /** Force the solid dark pill style — use when the badge sits over a photo. */
+  solid?: boolean;
 };
 
 const BADGE_COPY: Record<EntitlementStatus, { label: string; tone: StatusTone; solid?: boolean }> = {
@@ -12,7 +14,7 @@ const BADGE_COPY: Record<EntitlementStatus, { label: string; tone: StatusTone; s
   ineligible: { label: 'Ineligible', tone: 'warning' },
 };
 
-export function RewardStateBadge({ status }: RewardStateBadgeProps) {
-  const { label, tone, solid } = BADGE_COPY[status];
-  return <StatusBadge label={label} tone={tone} solid={solid} />;
+export function RewardStateBadge({ status, solid }: RewardStateBadgeProps) {
+  const { label, tone, solid: defaultSolid } = BADGE_COPY[status];
+  return <StatusBadge label={label} tone={tone} solid={solid ?? defaultSolid} />;
 }
